@@ -3,3 +3,4 @@ dist
 genebe.egg-info
 tests
 simple_runner.py
+publish.sh

@@ -13,7 +13,7 @@ setup(
     long_description_content_type="text/markdown",
     author="Piotr Stawinski",
     description="GeneBe Client: A user-friendly system for annotating genetic variants",
-    url="https://genebe.net",
+    url="https://github.com/pstawinski/pygenebe",
     entry_points={
         "console_scripts": [
             "genebe=genebe.entrypoint:main",
