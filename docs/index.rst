@@ -12,6 +12,8 @@ Welcome to PyGeneBe's documentation!
 
    usage
    installation
+   limits
+   modules
 
 Indices and tables
 ==================

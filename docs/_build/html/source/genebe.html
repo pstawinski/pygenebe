@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>genebe package &mdash; PyGeneBe 0.14.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=9e420a66"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PyGeneBe
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">genebe</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PyGeneBe</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">genebe package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/genebe.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="genebe-package">
+<h1>genebe package<a class="headerlink" href="#genebe-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-genebe.client">
+<span id="genebe-client-module"></span><h2>genebe.client module<a class="headerlink" href="#module-genebe.client" title="Link to this heading"></a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="genebe.client.TooManyRequestsError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">genebe.client.</span></span><span class="sig-name descname"><span class="pre">TooManyRequestsError</span></span><a class="headerlink" href="#genebe.client.TooManyRequestsError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="genebe.client.WrongServerResponseError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">genebe.client.</span></span><span class="sig-name descname"><span class="pre">WrongServerResponseError</span></span><a class="headerlink" href="#genebe.client.WrongServerResponseError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="genebe.client.annotate_variants_list">
+<span class="sig-prename descclassname"><span class="pre">genebe.client.</span></span><span class="sig-name descname"><span class="pre">annotate_variants_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genome</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'hg38'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ensembl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_refseq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten_consequences</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_netrc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'https://api.genebe.net/cloud/api-public/v1/variants'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_bar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_acmg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_csq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_basic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_advanced</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_normalization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'snpeff'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">object</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#genebe.client.annotate_variants_list" title="Link to this definition"></a></dt>
+<dd><p>Annotates a list of genetic variants.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>variants (List[str]): A list of genetic variants to be annotated.</dt><dd><p>Format: chr-pos-ref-alt. Look at examples below.</p>
+</dd>
+<dt>use_ensembl (bool, optional): Whether to use Ensembl for annotation.</dt><dd><p>Defaults to True.</p>
+</dd>
+<dt>use_refseq (bool, optional): Whether to use RefSeq for annotation.</dt><dd><p>Defaults to True.</p>
+</dd>
+<dt>genome (str, optional): The genome version for annotation (e.g., ‘hg38’).</dt><dd><p>Defaults to ‘hg38’.</p>
+</dd>
+<dt>flatten_consequences (bool, optional): If set to False, return consequences as a list of objects.</dt><dd><p>If set to True, only the most important consequence is returned in a flat form.
+Defaults to True.</p>
+</dd>
+<dt>batch_size (int, optional): The size of each batch for processing variants.</dt><dd><p>Defaults to 100. Must be smaller or equal 1000.</p>
+</dd>
+<dt>username (str, optional): The username for authentication.</dt><dd><p>Defaults to None.</p>
+</dd>
+<dt>api_key (str, optional): The API key for authentication.</dt><dd><p>Defaults to None.</p>
+</dd>
+<dt>use_netrc (bool, optional): Whether to use credentials from the user’s</dt><dd><p>.netrc file for authentication. Defaults to True.</p>
+</dd>
+<dt>endpoint_url (str, optional): The API endpoint for variant annotation.</dt><dd><p>Defaults to ‘<a class="reference external" href="https://api.genebe.net/cloud/api-public/v1/variants">https://api.genebe.net/cloud/api-public/v1/variants</a>’.</p>
+</dd>
+<dt>progress_bar (bool, optional): Show progress bar.</dt><dd><p>Defaults to True.</p>
+</dd>
+</dl>
+<p>omit_acmg (bool, optional): Don’t add ACMG scores in the output. Defaults to False.
+omit_csq (bool, optional): Don’t add consequences in the output. Defaults to False.
+omit_basic (bool, optional): Don’t add basic annotations (GnomAD frequencies etc) in the output. Defaults to False.
+omit_advanced (bool, optional): Don’t add advanced annotations (ClinVar etc) in the output. Defaults to False.
+omit_normalization (bool, optional): Don’t normalize variants. Use only if you are sure they are normalized already. Defaults to False.
+annotator (str, optional): Which VEP implementation to use.</p>
+<blockquote>
+<div><p>Defaults to snpeff.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>List[Dict[str, object]]: A list of dictionaries containing annotation information
+for each variant. The dictionary structure may vary. Check the current documentation
+on <a class="reference external" href="https://genebe.net/about/api">https://genebe.net/about/api</a></p>
+</dd>
+<dt>Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">variants</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;7-69599651-A-G&quot;</span><span class="p">,</span> <span class="s2">&quot;6-160585140-T-G&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">annotations</span> <span class="o">=</span> <span class="n">annotate_variants_list</span><span class="p">(</span><span class="n">variants</span><span class="p">,</span> <span class="n">use_ensembl</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>                                     <span class="n">use_refseq</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">genome</span><span class="o">=</span><span class="s1">&#39;hg38&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                     <span class="n">batch_size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="s2">&quot;user123@example.com&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                                     <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;apikey456&quot;</span><span class="p">,</span> <span class="n">use_netrc</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>                                     <span class="n">endpoint_url</span><span class="o">=</span><span class="s1">&#39;https://api.genebe.net/cloud/api-public/v1/variants&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">annotations</span><span class="p">)</span>
+<span class="go">[{&#39;chr&#39;: &#39;7&#39;, &#39;pos&#39;:69599651 (...) }]</span>
+</pre></div>
+</div>
+</dd>
+<dt>Note:</dt><dd><ul class="simple">
+<li><p>The number of the elements in returned list is always equal to the number of queries.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="genebe.client.annotate_variants_list_to_dataframe">
+<span class="sig-prename descclassname"><span class="pre">genebe.client.</span></span><span class="sig-name descname"><span class="pre">annotate_variants_list_to_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ensembl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_refseq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genome</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'hg38'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten_consequences</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_netrc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'https://api.genebe.net/cloud/api-public/v1/variants'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#genebe.client.annotate_variants_list_to_dataframe" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="genebe.client.parse_hgvs">
+<span class="sig-prename descclassname"><span class="pre">genebe.client.</span></span><span class="sig-name descname"><span class="pre">parse_hgvs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hgvs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_netrc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'https://api.genebe.net/cloud/api-public/v1/hgvs'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#genebe.client.parse_hgvs" title="Link to this definition"></a></dt>
+<dd><p>Parses a list of genetic variants encoded in HGVS.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>hgvs (List[str]): A list of genetic variants in hgvs format.</dt><dd><p>Supports .n:, .c:, .g: and .m:. Look at examples below.</p>
+</dd>
+<dt>batch_size (int, optional): The size of each batch for processing variants.</dt><dd><p>Defaults to 500. Must be smaller or equal 1000.</p>
+</dd>
+<dt>username (str, optional): The username for authentication.</dt><dd><p>Defaults to None.</p>
+</dd>
+<dt>api_key (str, optional): The API key for authentication.</dt><dd><p>Defaults to None.</p>
+</dd>
+<dt>use_netrc (bool, optional): Whether to use credentials from the user’s</dt><dd><p>.netrc file for authentication. Defaults to True.</p>
+</dd>
+<dt>endpoint_url (str, optional): The API endpoint for parsing hgvs.</dt><dd><p>Defaults to ‘<a class="reference external" href="https://api.genebe.net/cloud/api-public/v1/hgvs">https://api.genebe.net/cloud/api-public/v1/hgvs</a>’.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>List[str]: A list of dictionaries containing annotation information
+for each variant. Check the current documentation
+on <a class="reference external" href="https://genebe.net/about/api">https://genebe.net/about/api</a></p>
+</dd>
+<dt>Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">hgvs_variants</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&#39;NM_000277.2:c.1A&gt;G&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">variants</span> <span class="o">=</span> <span class="n">parse_hgvs</span><span class="p">(</span><span class="n">hgvs_variants</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">variants</span><span class="p">)</span>
+<span class="go">[&#39;12-102917129-AT-AC&#39;, &#39;12-102852850-GA-G&#39;]</span>
+</pre></div>
+</div>
+</dd>
+<dt>Note:</dt><dd><ul class="simple">
+<li><p>The number of the elements in returned list is always equal to the number of queries.</p></li>
+</ul>
+<p>If some position cannot be parsed, an empty string is returned.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="genebe.client.whoami">
+<span class="sig-prename descclassname"><span class="pre">genebe.client.</span></span><span class="sig-name descname"><span class="pre">whoami</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_netrc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'https://api.genebe.net/cloud/api-public/v1/whoami'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#genebe.client.whoami" title="Link to this definition"></a></dt>
+<dd><p>Information about me: usage statistics, limits etc.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>username (str, optional): The username for authentication.</dt><dd><p>Defaults to None.</p>
+</dd>
+<dt>api_key (str, optional): The API key for authentication.</dt><dd><p>Defaults to None.</p>
+</dd>
+<dt>use_netrc (bool, optional): Whether to use credentials from the user’s</dt><dd><p>.netrc file for authentication. Defaults to True.</p>
+</dd>
+<dt>endpoint_url (str, optional): The API endpoint to use.</dt><dd><p>Defaults to ‘<a class="reference external" href="https://api.genebe.net/cloud/api-public/v1/whoami">https://api.genebe.net/cloud/api-public/v1/whoami</a>’.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>An object. Check the current documentation
+on <a class="reference external" href="https://genebe.net/about/api">https://genebe.net/about/api</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-genebe.entrypoint">
+<span id="genebe-entrypoint-module"></span><h2>genebe.entrypoint module<a class="headerlink" href="#module-genebe.entrypoint" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="genebe.entrypoint.account_command">
+<span class="sig-prename descclassname"><span class="pre">genebe.entrypoint.</span></span><span class="sig-name descname"><span class="pre">account_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#genebe.entrypoint.account_command" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="genebe.entrypoint.main">
+<span class="sig-prename descclassname"><span class="pre">genebe.entrypoint.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#genebe.entrypoint.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-genebe.gbid">
+<span id="genebe-gbid-module"></span><h2>genebe.gbid module<a class="headerlink" href="#module-genebe.gbid" title="Link to this heading"></a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="genebe.gbid.InvalidPositionException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">genebe.gbid.</span></span><span class="sig-name descname"><span class="pre">InvalidPositionException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#genebe.gbid.InvalidPositionException" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="genebe.gbid.PositionEncoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">genebe.gbid.</span></span><span class="sig-name descname"><span class="pre">PositionEncoder</span></span><a class="headerlink" href="#genebe.gbid.PositionEncoder" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="genebe.gbid.PositionEncoder.CHR_NOT_SUPPORTED">
+<span class="sig-name descname"><span class="pre">CHR_NOT_SUPPORTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#genebe.gbid.PositionEncoder.CHR_NOT_SUPPORTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="genebe.gbid.PositionEncoder.ERROR_WRONG_CHR_POSITION">
+<span class="sig-name descname"><span class="pre">ERROR_WRONG_CHR_POSITION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-2</span></em><a class="headerlink" href="#genebe.gbid.PositionEncoder.ERROR_WRONG_CHR_POSITION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="genebe.gbid.PositionEncoder.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chromosome</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#genebe.gbid.PositionEncoder.encode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="genebe.gbid.PositionEncoder.encode_1_based_without_throw">
+<span class="sig-name descname"><span class="pre">encode_1_based_without_throw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chromosome</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#genebe.gbid.PositionEncoder.encode_1_based_without_throw" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">genebe.gbid.</span></span><span class="sig-name descname"><span class="pre">VariantIdEncoder</span></span><a class="headerlink" href="#genebe.gbid.VariantIdEncoder" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.BASES">
+<span class="sig-name descname"><span class="pre">BASES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['A',</span> <span class="pre">'C',</span> <span class="pre">'G',</span> <span class="pre">'T']</span></em><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.BASES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.MASK_CHANGE_HASH_VALUE">
+<span class="sig-name descname"><span class="pre">MASK_CHANGE_HASH_VALUE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">536870911</span></em><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.MASK_CHANGE_HASH_VALUE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.MASK_C_HASH">
+<span class="sig-name descname"><span class="pre">MASK_C_HASH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">536870912</span></em><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.MASK_C_HASH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.MASK_DEL">
+<span class="sig-name descname"><span class="pre">MASK_DEL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">33292288</span></em><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.MASK_DEL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.MASK_HASH">
+<span class="sig-name descname"><span class="pre">MASK_HASH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9223372036854775808</span></em><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.MASK_HASH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.MASK_INS">
+<span class="sig-name descname"><span class="pre">MASK_INS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">262143</span></em><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.MASK_INS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.MASK_INS_LEN">
+<span class="sig-name descname"><span class="pre">MASK_INS_LEN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">503316480</span></em><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.MASK_INS_LEN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.MASK_NULL">
+<span class="sig-name descname"><span class="pre">MASK_NULL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4611686018427387904</span></em><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.MASK_NULL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.MASK_POS">
+<span class="sig-name descname"><span class="pre">MASK_POS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4611686017353646080</span></em><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.MASK_POS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.MAX_DEL_LENGTH">
+<span class="sig-name descname"><span class="pre">MAX_DEL_LENGTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">127</span></em><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.MAX_DEL_LENGTH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.MAX_INS_LENGTH">
+<span class="sig-name descname"><span class="pre">MAX_INS_LENGTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></em><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.MAX_INS_LENGTH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.RADIX">
+<span class="sig-name descname"><span class="pre">RADIX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">36</span></em><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.RADIX" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.change_hash">
+<span class="sig-name descname"><span class="pre">change_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">del_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.change_hash" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.encode1based">
+<span class="sig-name descname"><span class="pre">encode1based</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chromosome</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.encode1based" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.encode_bases">
+<span class="sig-name descname"><span class="pre">encode_bases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.encode_bases" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.hash">
+<span class="sig-name descname"><span class="pre">hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chromosome</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">del_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.hash" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.positionEncoder">
+<span class="sig-name descname"><span class="pre">positionEncoder</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;genebe.gbid.PositionEncoder</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.positionEncoder" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="genebe.gbid.VariantIdEncoder.set_value">
+<span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#genebe.gbid.VariantIdEncoder.set_value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-genebe.json_simple_annotator">
+<span id="genebe-json-simple-annotator-module"></span><h2>genebe.json_simple_annotator module<a class="headerlink" href="#module-genebe.json_simple_annotator" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="genebe.json_simple_annotator.annotate_json">
+<span class="sig-prename descclassname"><span class="pre">genebe.json_simple_annotator.</span></span><span class="sig-name descname"><span class="pre">annotate_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_json_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_json_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genome</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'hg38'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ensembl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_refseq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten_consequences</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_netrc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'https://api.genebe.net/cloud/api-public/v1/variants'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_acmg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_csq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_basic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_advanced</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_normalization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#genebe.json_simple_annotator.annotate_json" title="Link to this definition"></a></dt>
+<dd><p>Annotates a JSON file using the annotate_variants_list function.</p>
+<dl>
+<dt>Args:</dt><dd><p>input_json_path (str): Path to the input json lines file.
+output_json_path (str): Path to the output annotated json lines file.
+genome (str, optional): The genome version for annotation (e.g., ‘hg38’).</p>
+<blockquote>
+<div><p>Defaults to ‘hg38’.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>use_ensembl (bool, optional): Whether to use Ensembl for annotation.</dt><dd><p>Defaults to True.</p>
+</dd>
+<dt>use_refseq (bool, optional): Whether to use RefSeq for annotation.</dt><dd><p>Defaults to True.</p>
+</dd>
+<dt>flatten_consequences (bool, optional): If set to False, return consequences as a list of objects.</dt><dd><p>If set to True, only the most important consequence is returned in a flat form.
+Defaults to True.</p>
+</dd>
+<dt>batch_size (int, optional): The size of each batch for processing variants.</dt><dd><p>Defaults to 100. Must be smaller or equal 1000.</p>
+</dd>
+<dt>username (str, optional): The username for authentication.</dt><dd><p>Defaults to None.</p>
+</dd>
+<dt>api_key (str, optional): The API key for authentication.</dt><dd><p>Defaults to None.</p>
+</dd>
+<dt>use_netrc (bool, optional): Whether to use credentials from the user’s</dt><dd><p>.netrc file for authentication. Defaults to True.</p>
+</dd>
+<dt>endpoint_url (str, optional): The API endpoint for variant annotation.</dt><dd><p>Defaults to ‘<a class="reference external" href="https://api.genebe.net/cloud/api-public/v1/variants">https://api.genebe.net/cloud/api-public/v1/variants</a>’.</p>
+</dd>
+</dl>
+<p>omit_acmg (bool, optional): Don’t add ACMG scores in the output. Defaults to False.
+omit_csq (bool, optional): Don’t add consequences in the output. Defaults to False.
+omit_basic (bool, optional): Don’t add basic annotations (GnomAD frequencies etc) in the output. Defaults to False.
+omit_advanced (bool, optional): Don’t add advanced annotations (ClinVar etc) in the output. Defaults to False.
+omit_normalization (bool, optional): Don’t normalize variants. Use only if you are sure they are normalized already. Defaults to False.
+progress (bool, optional): Show progress bar</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-genebe.vcf_simple_annotator">
+<span id="genebe-vcf-simple-annotator-module"></span><h2>genebe.vcf_simple_annotator module<a class="headerlink" href="#module-genebe.vcf_simple_annotator" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="genebe.vcf_simple_annotator.annotate_vcf">
+<span class="sig-prename descclassname"><span class="pre">genebe.vcf_simple_annotator.</span></span><span class="sig-name descname"><span class="pre">annotate_vcf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_vcf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_vcf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genome</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'hg38'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ensembl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_refseq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten_consequences</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_netrc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'https://api.genebe.net/cloud/api-public/v1/variants'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_acmg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_csq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_basic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_advanced</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_normalization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#genebe.vcf_simple_annotator.annotate_vcf" title="Link to this definition"></a></dt>
+<dd><p>Annotates a VCF file using the annotate_variants_list function.</p>
+<dl>
+<dt>Args:</dt><dd><p>input_vcf_path (str): Path to the input VCF file.
+output_vcf_path (str): Path to the output annotated VCF file.
+genome (str, optional): The genome version for annotation (e.g., ‘hg38’).</p>
+<blockquote>
+<div><p>Defaults to ‘hg38’.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>use_ensembl (bool, optional): Whether to use Ensembl for annotation.</dt><dd><p>Defaults to True.</p>
+</dd>
+<dt>use_refseq (bool, optional): Whether to use RefSeq for annotation.</dt><dd><p>Defaults to True.</p>
+</dd>
+<dt>flatten_consequences (bool, optional): If set to False, return consequences as a list of objects.</dt><dd><p>If set to True, only the most important consequence is returned in a flat form.
+Defaults to True.</p>
+</dd>
+<dt>batch_size (int, optional): The size of each batch for processing variants.</dt><dd><p>Defaults to 100. Must be smaller or equal 1000.</p>
+</dd>
+<dt>username (str, optional): The username for authentication.</dt><dd><p>Defaults to None.</p>
+</dd>
+<dt>api_key (str, optional): The API key for authentication.</dt><dd><p>Defaults to None.</p>
+</dd>
+<dt>use_netrc (bool, optional): Whether to use credentials from the user’s</dt><dd><p>.netrc file for authentication. Defaults to True.</p>
+</dd>
+<dt>endpoint_url (str, optional): The API endpoint for variant annotation.</dt><dd><p>Defaults to ‘<a class="reference external" href="https://api.genebe.net/cloud/api-public/v1/variants">https://api.genebe.net/cloud/api-public/v1/variants</a>’.</p>
+</dd>
+</dl>
+<p>omit_acmg (bool, optional): Don’t add ACMG scores in the output. Defaults to False.
+omit_csq (bool, optional): Don’t add consequences in the output. Defaults to False.
+omit_basic (bool, optional): Don’t add basic annotations (GnomAD frequencies etc) in the output. Defaults to False.
+omit_advanced (bool, optional): Don’t add advanced annotations (ClinVar etc) in the output. Defaults to False.
+omit_normalization (bool, optional): Don’t normalize variants. Use only if you are sure they are normalized already. Defaults to False.
+progress (bool, optional): Show progress bar</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-genebe.version">
+<span id="genebe-version-module"></span><h2>genebe.version module<a class="headerlink" href="#module-genebe.version" title="Link to this heading"></a></h2>
+</section>
+<section id="module-genebe">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-genebe" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stawinski.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

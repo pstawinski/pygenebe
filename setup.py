@@ -19,4 +19,10 @@ setup(
             "genebe=genebe.entrypoint:main",
         ],
     },
+    classifiers=[
+        "Programming Language :: Python",
+        "Topic :: Scientific/Engineering :: Bio-Informatics",
+        "Topic :: Scientific/Engineering :: Medical Science Apps.",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+    ],
 )

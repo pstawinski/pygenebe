@@ -25,7 +25,7 @@ Check current options using `--help` switch:
    genebe annotate --help
 
 Annotating VCF using `annotate` command
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GeneBe client allows you to annotate your VCF file with ease. Use the following command:
 

@@ -1,5 +1,5 @@
 ## GeneBe Utils
-GeneBe: A Python client seamlessly integrating with the GeneBe platform, offering efficient annotation of genetic variants through its API, while supporting pandas, VCF file formats, and HGVS parsing
+PyGeneBe: A Python client seamlessly integrating with the GeneBe platform, offering efficient annotation of genetic variants through its API, while supporting pandas, VCF file formats, and HGVS parsing
 
 Using this client, you can easily annotate your DNA variants with the GeneBe API. Annotations include:
 * Gene, transcript, and effect
@@ -9,6 +9,8 @@ Using this client, you can easily annotate your DNA variants with the GeneBe API
 * ... if you need more, please let me know
 
 ### Usage
+
+For more information about the usage, go to the https://pygenebe.readthedocs.io/en/latest/ documentation.
 
 #### Command line usage
 
