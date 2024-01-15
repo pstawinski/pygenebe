@@ -79,6 +79,30 @@ def annotate_vcf(
             "Description": "ACMG Score by GeneBe",
         }
     )
+    vcf_reader.add_info_to_header(
+        {
+            "ID": "acmg_criteria",
+            "Number": ".",
+            "Type": "String",
+            "Description": "ACMG Score by GeneBe",
+        }
+    )
+    vcf_reader.add_info_to_header(
+        {
+            "ID": "gnomad_exomes_af",
+            "Number": "1",
+            "Type": "Float",
+            "Description": "GnomAD exomes Allele Frequency, by GeneBe",
+        }
+    )
+    vcf_reader.add_info_to_header(
+        {
+            "ID": "gnomad_genomes_af",
+            "Number": "1",
+            "Type": "Float",
+            "Description": "GnomAD genomes Allele Frequency, by GeneBe",
+        }
+    )
 
     # Open the output VCF file for writing
     vcf_writer = cyvcf2.Writer(output_vcf_path, vcf_reader)
@@ -120,13 +144,19 @@ def annotate_vcf(
 
             # Add ACMG scores to the variants and write to the output VCF file
             for variant, annotated_variant in zip(batch, annotated_variants):
-                acmg_score = annotated_variant.get("acmg_score")
-                if acmg_score is not None:
-                    variant.INFO["acmg_score"] = acmg_score
-                else:
-                    logging.warning(
-                        f"No annotation for {variant.CHROM}-{variant.POS}-{variant.REF}-{variant.ALT[0]}"
-                    )
+                fields_to_copy = [
+                    "acmg_score",
+                    "gnomad_exomes_af",
+                    "gnomad_genomes_af",
+                    "acmg_criteria",
+#                    "consequences_ensembl",
+#                    "consequences_refseq",
+                ]
+
+                for field in fields_to_copy:
+                    value = annotated_variant.get(field)
+                    if value is not None:
+                        variant.INFO[field] = value
 
                 vcf_writer.write_record(variant)
             pbar.update(len(batch))
