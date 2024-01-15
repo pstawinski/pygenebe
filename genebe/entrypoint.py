@@ -19,6 +19,9 @@ def account_command(args):
     )
     print(result)
 
+def version_command(args):
+    # Add your login logic here
+    print(f"GeneBe, version {__version__}")
 
 def main():
     parser = argparse.ArgumentParser(
@@ -114,7 +117,7 @@ def main():
         default=False,
     )
 
-    # Subparser for the 'login' command
+    # Subparser for the 'account' command
     account_parser = subparsers.add_parser(
         "account", help="Account information in GeneBe"
     )
@@ -127,6 +130,11 @@ def main():
         "--endpoint_url",
         default="https://api.genebe.net/cloud/api-public/v1/whoami",
         help="API endpoint URL (default: https://api.genebe.net/cloud/api-public/v1/whoami)",
+    )
+
+    # Subparser for the 'version' command
+    account_parser = subparsers.add_parser(
+        "version", help="Display client version"
     )
 
     args = parser.parse_args()
@@ -181,6 +189,8 @@ def main():
             )
     elif args.command == "account":
         account_command(args)
+    elif args.command == "version":
+        version_command(args)
     else:
         logging.error(f"Not recognized command: {args.command}")
 
