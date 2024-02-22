@@ -340,6 +340,122 @@ def annotate_variants_list_to_dataframe(
     return df
 
 
+class DnaChange:
+    def __init__(self, chr, pos, ref, alt):
+        self.chr = chr
+        self.pos = int(pos)
+        self.ref = ref
+        self.alt = alt
+
+
+def lift_over_variants(
+    variants: List[str],
+    from_genome: str = "hg19",
+    dest_genome: str = "hg38",
+    username: str = None,
+    api_key: str = None,
+    use_netrc: bool = True,
+    endpoint_url: str = "https://api.genebe.net/cloud/api-public/v1/liftover",
+) -> List[str]:
+    """
+    Lifts over a list of genetic variants between human genome versions.
+
+    Args:
+        variants (List[str]): A list of genetic variants represented as strings (chr-pos-ref-alt).
+        from_genome (str): Source human genome version, one of hg19, hg38, t2t.
+        dest_genome (str): Destination human genome version, one of hg19, hg38, t2t.
+        username (str, optional): The username for authentication.
+            Defaults to None.
+        api_key (str, optional): The API key for authentication.
+            Defaults to None.
+        use_netrc (bool, optional): Whether to use credentials from the user's
+            .netrc file for authentication. Defaults to True.
+        endpoint_url (str, optional): The API endpoint.
+            Defaults to 'https://api.genebe.net/cloud/api-public/v1/liftover'.
+
+
+
+    Returns:
+        List[str]: A list of lifted variants.
+
+    Example:
+        >>> input_variants = ['chr6-161006172-T-G']
+        >>> from_genome = "hg19"
+        >>> dest_genome = "hg38"
+        >>> lifted_variants = lift_over_variants(input_variants, from_genome, dest_genome)
+        >>> print(lifted_variants)
+        ['chr6-160585140-T-G']
+    """
+    headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": user_agent,
+    }
+
+    # Parse input strings into DnaChange objects
+    dna_changes = [DnaChange(*variant.split("-")) for variant in variants]
+
+    # Prepare the payload
+    variants = [
+        {
+            "chr": dna_change.chr,
+            "pos": dna_change.pos,
+            "ref": dna_change.ref,
+            "alt": dna_change.alt,
+        }
+        for dna_change in dna_changes
+    ]
+
+    print(f"this is my payload: {json.dumps(variants)}")
+
+    if (username is not None) and (api_key is not None):
+        auth = (username, api_key)
+        if use_netrc:
+            _save_credentials_to_netrc(endpoint_url, username, api_key)
+    elif use_netrc:
+        username, _, api_key = _read_netrc_credentials(endpoint_url)
+        if (username is not None) and (api_key is not None):
+            auth = (username, api_key)
+        else:
+            auth = None
+    else:
+        auth = None
+
+    params = {
+        "from": from_genome,
+        "dest": dest_genome,
+    }
+
+    batch_size = 500
+    # Make the POST request
+
+    result = []
+    for i in tqdm(range(0, len(variants), batch_size)):
+        # Prepare data for API request
+        chunk = variants[i : i + batch_size]
+        response = requests.post(
+            endpoint_url, params=params, json=chunk, headers=headers, auth=auth
+        )
+
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            # Assuming the response contains a list of lifted variants
+            lifted_variants = response.json()
+            result.extend(
+                (
+                    f"{element.get('chr', '')}-{element.get('pos', '')}-{element.get('ref', '')}-{element.get('alt', '')}"
+                    if element.get("chr")
+                    else ""
+                )
+                for element in lifted_variants
+            )
+        else:
+            # Print an error message if the request was not successful
+            print(f"Error: {response.status_code}, {response.text}")
+            return []
+    return result
+
+
 def parse_hgvs(
     hgvs: List[str],
     batch_size: int = 500,
@@ -407,9 +523,11 @@ def parse_hgvs(
             api_results_raw = response.json()
             logging.debug("Api reqult raw" + json.dumps(api_results_raw))
             api_results = [
-                f"{element.get('chr', '')}-{element.get('pos', '')}-{element.get('ref', '')}-{element.get('alt', '')}"
-                if "chr" in element and "pos" in element
-                else ""
+                (
+                    f"{element.get('chr', '')}-{element.get('pos', '')}-{element.get('ref', '')}-{element.get('alt', '')}"
+                    if "chr" in element and "pos" in element
+                    else ""
+                )
                 for element in api_results_raw
             ]
 
@@ -429,6 +547,47 @@ def parse_hgvs(
                 + response.text
             )
     return result
+
+
+def annotate_dataframe_variants(df: pd.DataFrame, **kwargs) -> pd.DataFrame:
+    """
+    Annotates genetic variants in a DataFrame using the 'annotate_variants_list_to_dataframe' function.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame with genetic variant information. Must contain columns
+        ["chr", "pos", "ref", "alt"]
+        **kwargs: Additional keyword arguments to pass to 'annotate_variants_list_to_dataframe'.
+
+    Returns:
+        pd.DataFrame: A new DataFrame with additional annotation information.
+
+    Example:
+        >>> df = pd.DataFrame({'chr': ['6', '22'], 'pos': [160585140, 28695868], 'ref': ['T', 'AG'], 'alt': ['G', 'A']})
+        >>> annotated_df = annotate_dataframe_variants(df, genome='hg38',use_ensembl=False,use_refseq=True, genome='hg38', flatten_consequences=True)
+        >>> print(annotated_df)
+    """
+    # Ensure required columns are present in the DataFrame
+    required_columns = ["chr", "pos", "ref", "alt"]
+    missing_columns = [col for col in required_columns if col not in df.columns]
+    if missing_columns:
+        raise ValueError(f"Missing required columns in DataFrame: {missing_columns}")
+
+    # Create a list of variant strings by concatenating columns
+    variant_strings = [
+        f"{row['chr']}-{row['pos']}-{row['ref']}-{row['alt']}"
+        for _, row in df.iterrows()
+    ]
+
+    # Annotate variants using 'annotate_variants_list_to_dataframe'
+    annotation_df = annotate_variants_list_to_dataframe(
+        variants=variant_strings, **kwargs
+    )
+    annotation_df = annotation_df.drop(columns=["chr", "pos", "ref", "alt"])
+
+    # Join the original DataFrame with the annotation results
+    result_df = pd.concat([df.reset_index(drop=True), annotation_df], axis=1)
+
+    return result_df
 
 
 def whoami(

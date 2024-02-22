@@ -88,6 +88,18 @@ df = gnb.annotate_variants_list_to_dataframe(input_variants, flatten_consequence
 input_hgvs = ['NM_000277.2:c.1A>G']
 parsed_variants = gnb.parse_hgvs(input_hgvs)
 
+# annotate existing dataframe with chr, pos, ref, alt columns
+
+df = pd.DataFrame({'chr': ['6', '22'], 'pos': [160585140, 28695868], 'ref': ['T', 'AG'], 'alt': ['G', 'A']})
+annotated_df = gnb.annotate_dataframe_variants(df, genome='hg38',use_ensembl=False,use_refseq=True, genome='hg38', flatten_consequences=True)
+
+# lift over variants from hg19 to hg38
+input_variants = ['chr6-161006172-T-G']
+from_genome = "hg19"
+dest_genome = "hg38"
+lifted_variants = gnb.lift_over_variants(input_variants, from_genome, dest_genome)
+
+
 ```
 
 If you want to annotate thousands of variants, please log in to https://genebe.net, generate an API Key, and provide it using `username` and `api_key`.

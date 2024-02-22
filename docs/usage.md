@@ -48,6 +48,7 @@ genebe annotate --help
 
 ## Library usage
 
+### Simple annotation of genetic variants
 Example of annotating a single variant.
 ```python
 import genebe as gnb
@@ -60,9 +61,35 @@ list = gnb.annotate_variants_list(input_variants,flatten_consequences = False)
 # output as a pandas dataframe, flat
 df = gnb.annotate_variants_list_to_dataframe(input_variants, flatten_consequences=True)
 
+
+```
+
+### Annotating pandas dataframe
+If you have a pandas dataframe named `df` with columns `chr`, `pos`, `ref`, `alt` then annotating it with variant consequences etc. is as easy as:
+
+```python
+import genebe as gnb
+annotated = gnb.annotate_dataframe_variants(df,use_ensembl=False,use_refseq=True, genome='hg38', flatten_consequences=True)
+```
+
+### Parsing HGVS
+```python
+import genebe as gnb
 # parse HGVS
 input_hgvs = ['NM_000277.2:c.1A>G']
 parsed_variants = gnb.parse_hgvs(input_hgvs)
 ```
+
+### Making a liftover
+Simple lift genetic variants between hg19/hg38/T2T
+```python
+import genebe as gnb
+# parse HGVS
+input_hgvs = ['NM_000277.2:c.1A>G']
+gnb.lift_over_variants(['chr6-161006172-T-G'])
+```
+
+
+----
 
 Find more usage examples on GitHub https://github.com/pstawinski/pygenebe/tree/main/examples
