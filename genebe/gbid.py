@@ -164,6 +164,14 @@ class VariantIdEncoder:
         # make 0 based
         position = position - 1
 
+        altNorm = alt.upper()
+
+        while len(ref) > 0 and len(altNorm) > 0 and ref[0] == altNorm[0]:
+            # strip leading common character, may happen in deletions / insertions
+            position += 1
+            ref = ref[1:]
+            altNorm = altNorm[1:]
+
         # if ref is string than replace with length
         if isinstance(ref, str):
             ref = len(ref)
@@ -179,8 +187,6 @@ class VariantIdEncoder:
             raise InvalidPositionException(
                 "Wrong position: {}:{}.".format(chromosome, position)
             )
-
-        altNorm = alt.upper()
 
         if not set(altNorm).issubset("ACGNT"):
             raise InvalidPositionException(

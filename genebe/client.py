@@ -10,6 +10,8 @@ from tinynetrc import Netrc
 from urllib.parse import urlparse
 from importlib import metadata
 from .version import __version__
+from pathlib import Path
+
 
 try:
     from tqdm import tqdm
@@ -57,10 +59,19 @@ def _parse_variant_string(s):
 
 
 def _save_credentials_to_netrc(machine, login, password):
-    netrc = Netrc()
-    netrc[machine]["login"] = login
-    netrc[machine]["password"] = password
-    netrc.save()
+    try:
+        fpath = Path().home().joinpath(".netrc")
+        fpath.touch(exist_ok=True)
+        netrc = Netrc(str(fpath))
+
+        netrc[machine]["login"] = login
+        netrc[machine]["password"] = password
+        netrc.save()
+        print(
+            "Saved credentials to .netrc, you don't need to provide username/api_key anymore."
+        )
+    except Exception as e:
+        print(f"An error occurred while saving credentials to {fpath}: {e}")
 
 
 def _get_machine_name_from_endpoint(endpoint):
