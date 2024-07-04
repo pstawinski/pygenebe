@@ -135,7 +135,7 @@ There is a dockerized version of this package, available at https://hub.docker.c
 
 Usage example, reading from file `input.vcf` and writing output to `stdout`:
 ```
-docker run -v input.vcf:/tmp/input.vcf --rm genebe/pygenebe:0.0.14 genebe annotate --input /tmp/input.vcf --output /dev/stdout
+docker run -v ./input.vcf:/tmp/input.vcf --rm genebe/pygenebe:0.0.18 genebe annotate --input /tmp/input.vcf --output /dev/stdout
 ```
 
 ### Limits
