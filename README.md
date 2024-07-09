@@ -75,23 +75,44 @@ GeneBe makes annotating DNA variants in pandas dataframe easy.
 
 ```python
 import genebe as gnb
+import pandas as pd
 
 input_variants = ['7-69599651-A-G']
 
-# output as a list, with all transcripts
-list = gnb.annotate_variants_list(input_variants,flatten_consequences = False)
+# annotate variants with transcripts etc. output as a list; use .netrc for user login and api key
+list = gnb.annotate(input_variants,
+use_ensembl=True,
+    use_refseq=False,
+    genome="hg38",
+    batch_size=500,
+    use_netrc=True,
+    output_format="list")
+
 
 # output as a pandas dataframe, flat
-df = gnb.annotate_variants_list_to_dataframe(input_variants, flatten_consequences=True)
+df = gnb.annotate(input_variants,
+    use_ensembl=True,
+    use_refseq=False,
+    genome="hg38",
+    flatten_consequences=True,
+    batch_size=500,
+    use_netrc=True,
+    output_format="dataframe")
+
 
 # parse HGVS
 input_hgvs = ['NM_000277.2:c.1A>G']
 parsed_variants = gnb.parse_hgvs(input_hgvs)
 
-# annotate existing dataframe with chr, pos, ref, alt columns
-
+# annotate existing dataframe, using it's chr, pos, ref, alt columns and adding new columns
 df = pd.DataFrame({'chr': ['6', '22'], 'pos': [160585140, 28695868], 'ref': ['T', 'AG'], 'alt': ['G', 'A']})
-annotated_df = gnb.annotate_dataframe_variants(df, genome='hg38',use_ensembl=False,use_refseq=True, genome='hg38', flatten_consequences=True)
+annotated_df = gnb.annotate(df,
+    genome='hg38',
+    use_ensembl=False,
+    use_refseq=True,
+    flatten_consequences=True,
+    output_format="dataframe")
+
 
 # lift over variants from hg19 to hg38
 input_variants = ['chr6-161006172-T-G']
@@ -102,7 +123,7 @@ lifted_variants = gnb.lift_over_variants(input_variants, from_genome, dest_genom
 
 ```
 
-If you want to annotate thousands of variants, please log in to https://genebe.net, generate an API Key, and provide it using `username` and `api_key`.
+If you want to annotate thousands of variants, please log in to https://genebe.net, generate an API Key, and provide it using `username` and `api_key` or using the `.netrc` file.
 
 Find out more usage examples in the `examples` directory.
 
@@ -135,7 +156,7 @@ There is a dockerized version of this package, available at https://hub.docker.c
 
 Usage example, reading from file `input.vcf` and writing output to `stdout`:
 ```
-docker run -v ./input.vcf:/tmp/input.vcf --rm genebe/pygenebe:0.0.18 genebe annotate --input /tmp/input.vcf --output /dev/stdout
+docker run -v input.vcf:/tmp/input.vcf --rm genebe/pygenebe:0.0.14 genebe annotate --input /tmp/input.vcf --output /dev/stdout
 ```
 
 ### Limits

@@ -1,6 +1,6 @@
 import logging
 from itertools import islice
-from .client import annotate_variants_list
+from .client import annotate
 from typing import Optional
 from tqdm import tqdm
 
@@ -123,7 +123,7 @@ def annotate_vcf(
                 f"{variant.CHROM}-{variant.POS}-{variant.REF}-{variant.ALT[0]}"
                 for variant in batch
             ]
-            annotated_variants = annotate_variants_list(
+            annotated_variants = annotate(
                 variants_batch,
                 genome=genome,
                 use_ensembl=use_ensembl,
@@ -140,6 +140,7 @@ def annotate_vcf(
                 omit_basic=omit_basic,
                 omit_advanced=omit_advanced,
                 omit_normalization=omit_normalization,
+                progress=progress,
             )
 
             # Add ACMG scores to the variants and write to the output VCF file
@@ -149,8 +150,8 @@ def annotate_vcf(
                     "gnomad_exomes_af",
                     "gnomad_genomes_af",
                     "acmg_criteria",
-#                    "consequences_ensembl",
-#                    "consequences_refseq",
+                    #                    "consequences_ensembl",
+                    #                    "consequences_refseq",
                 ]
 
                 for field in fields_to_copy:

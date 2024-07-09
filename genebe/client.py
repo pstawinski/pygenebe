@@ -1,17 +1,14 @@
 import pandas as pd
 import requests
-from requests.auth import HTTPBasicAuth
-from typing import Dict, List
+from typing import Dict, List, Union
 import re
 import json
 import logging
 import netrc
 from tinynetrc import Netrc
 from urllib.parse import urlparse
-from importlib import metadata
 from .version import __version__
 from pathlib import Path
-
 
 try:
     from tqdm import tqdm
@@ -119,9 +116,8 @@ def _read_netrc_credentials(endpoint):
         return None, None, None
 
 
-# Function to annotate variants
-def annotate_variants_list(
-    variants: List[str],
+def annotate(
+    variants: Union[List[str], pd.DataFrame],
     genome: str = "hg38",
     use_ensembl: bool = True,
     use_refseq: bool = True,
@@ -138,60 +134,112 @@ def annotate_variants_list(
     omit_advanced: bool = False,
     omit_normalization: bool = False,
     annotator: str = "snpeff",
-) -> List[Dict[str, object]]:
+    output_format: str = "list",
+) -> Union[List[Dict[str, object]], pd.DataFrame]:
     """
-    Annotates a list of genetic variants.
+    Annotates genetic variants.
 
     Args:
-        variants (List[str]): A list of genetic variants to be annotated.
-            Format: chr-pos-ref-alt. Look at examples below.
-        use_ensembl (bool, optional): Whether to use Ensembl for annotation.
-            Defaults to True.
-        use_refseq (bool, optional): Whether to use RefSeq for annotation.
-            Defaults to True.
-        genome (str, optional): The genome version for annotation (e.g., 'hg38').
-            Defaults to 'hg38'.
-        flatten_consequences (bool, optional): If set to False, return consequences as a list of objects.
+        variants (Union[List[str], pd.DataFrame]): A list of genetic variants to be annotated
+            or a pandas DataFrame containing the variants. If a list, the format should be
+            chr-pos-ref-alt.
+        genome (str): The genome version for annotation (e.g., 'hg38'). Defaults to 'hg38'.
+        use_ensembl (bool): Whether to use Ensembl for annotation. Defaults to True.
+        use_refseq (bool): Whether to use RefSeq for annotation. Defaults to True.
+        flatten_consequences (bool): If set to False, return consequences as a list of objects.
             If set to True, only the most important consequence is returned in a flat form.
             Defaults to True.
-        batch_size (int, optional): The size of each batch for processing variants.
-            Defaults to 100. Must be smaller or equal 1000.
-        username (str, optional): The username for authentication.
-            Defaults to None.
-        api_key (str, optional): The API key for authentication.
-            Defaults to None.
-        use_netrc (bool, optional): Whether to use credentials from the user's
-            .netrc file for authentication. Defaults to True.
-        endpoint_url (str, optional): The API endpoint for variant annotation.
-            Defaults to 'https://api.genebe.net/cloud/api-public/v1/variants'.
-        progress_bar (bool, optional): Show progress bar.
+        batch_size (int): The size of each batch for processing variants. Defaults to 500.
+            Must be smaller or equal to 1000.
+        username (str): The username for authentication. Defaults to None.
+        api_key (str): The API key for authentication. Defaults to None.
+        use_netrc (bool): Whether to use credentials from the user's .netrc file for authentication.
             Defaults to True.
-        omit_acmg (bool, optional): Don't add ACMG scores in the output. Defaults to False.
-        omit_csq (bool, optional): Don't add consequences in the output. Defaults to False.
-        omit_basic (bool, optional): Don't add basic annotations (GnomAD frequencies etc) in the output. Defaults to False.
-        omit_advanced (bool, optional): Don't add advanced annotations (ClinVar etc) in the output. Defaults to False.
-        omit_normalization (bool, optional): Don't normalize variants. Use only if you are sure they are normalized already. Defaults to False.
-        annotator (str, optional): Which VEP implementation to use.
-            Defaults to snpeff.
+        endpoint_url (str): The API endpoint for variant annotation.
+            Defaults to 'https://api.genebe.net/cloud/api-public/v1/variants'.
+        progress_bar (bool): Show progress bar. Defaults to True.
+        omit_acmg (bool): Don't add ACMG scores in the output. Defaults to False.
+        omit_csq (bool): Don't add consequences in the output. Defaults to False.
+        omit_basic (bool): Don't add basic annotations (GnomAD frequencies etc) in the output. Defaults to False.
+        omit_advanced (bool): Don't add advanced annotations (ClinVar etc) in the output. Defaults to False.
+        omit_normalization (bool): Don't normalize variants. Use only if you are sure they are normalized already. Defaults to False.
+        annotator (str): Which VEP implementation to use. Defaults to snpeff.
+        output_format (str): The desired format of the output, either 'list' for a list of
+            dictionaries or 'dataframe' for a pandas DataFrame. Defaults to 'list'.
+            If input is a dataframe, then ignored and returns a dataframe.
 
     Returns:
-        List[Dict[str, object]]: A list of dictionaries containing annotation information
-        for each variant. The dictionary structure may vary. Check the current documentation
-        on https://genebe.net/about/api
+        Union[List[Dict[str, object]], pd.DataFrame]: If output_format is 'list', returns a list of
+        dictionaries containing annotation information for each variant. If output_format is 'dataframe',
+        returns a pandas DataFrame with the annotations.
+
+    Raises:
+        ValueError: If output_format is not one of 'list' or 'dataframe'.
+        TypeError: If variants is neither a List[str] nor a pandas DataFrame.
 
     Example:
-        >>> variants = ["7-69599651-A-G", "6-160585140-T-G"]
-        >>> annotations = annotate_variants_list(variants, use_ensembl=True,
-        ...                                      use_refseq=False, genome='hg38',
-        ...                                      batch_size=500, username="user123@example.com",
-        ...                                      api_key="apikey456", use_netrc=False,
-        ...                                      endpoint_url='https://api.genebe.net/cloud/api-public/v1/variants')
+        >>> annotations = annotate(
+        ...     ["7-69599651-A-G", "6-160585140-T-G"],
+        ...     genome='hg38',
+        ...     use_ensembl=True,
+        ...     use_refseq=False,
+        ...     batch_size=500,
+        ...     username="user123@example.com",
+        ...     api_key="apikey456",
+        ...     use_netrc=False,
+        ...     endpoint_url='https://api.genebe.net/cloud/api-public/v1/variants',
+        ...     output_format="list"
+        ... )
         >>> print(annotations)
-        [{'chr': '7', 'pos':69599651 (...) }]
+        [{'chr': '7', 'pos': 69599651, 'ref': 'A', 'alt': 'G', 'annotation': '...'}, ...]
+
+        >>> df = pd.DataFrame({"variant": ["7-69599651-A-G", "6-160585140-T-G"]})
+        >>> annotations_df = annotate(
+        ...     df,
+        ...     genome='hg38',
+        ...     use_ensembl=True,
+        ...     use_refseq=False,
+        ...     batch_size=500,
+        ...     username="user123@example.com",
+        ...     api_key="apikey456",
+        ...     use_netrc=False,
+        ...     endpoint_url='https://api.genebe.net/cloud/api-public/v1/variants',
+        ...     output_format="dataframe"
+        ... )
+        >>> print(annotations_df)
 
     Note:
-        - The number of the elements in returned list is always equal to the number of queries.
+        - The number of elements in the returned list or rows in the DataFrame is always equal to the number of queries.
     """
+
+    allowed_output_formats = ["list", "dataframe"]
+
+    if output_format not in allowed_output_formats:
+        raise ValueError(f"output_format must be one of {allowed_output_formats}")
+
+    join_with_oryginal_df = False
+    if isinstance(variants, pd.DataFrame):
+        required_columns = ["chr", "pos", "ref", "alt"]
+        missing_columns = [
+            col for col in required_columns if col not in variants.columns
+        ]
+        if missing_columns:
+            raise ValueError(
+                f"Missing required columns in DataFrame: {missing_columns}"
+            )
+
+        # Store the original DataFrame for later use
+        oryginal_df = variants
+        join_with_oryginal_df = True
+
+        # Create a list of variant strings by concatenating columns
+        variant_strings = [
+            f"{row['chr']}-{row['pos']}-{row['ref']}-{row['alt']}"
+            for _, row in variants.iterrows()
+        ]
+
+        variants = variant_strings  # now we continue with the list
+        output_format = "dataframe"
 
     if (use_refseq != True) and (use_ensembl != True):
         raise ValueError("use_refseq and use_ensembl cannot be both False")
@@ -317,7 +365,116 @@ def annotate_variants_list(
             item.pop("consequences_ensembl", None)
             item.pop("consequences_refseq", None)
 
-    return annotated_data
+    if join_with_oryginal_df:
+        annotation_df = pd.DataFrame(annotated_data)
+        annotation_df = annotation_df.drop(columns=["chr", "pos", "ref", "alt"])
+
+        # Join the original DataFrame with the annotation results
+        result_df = pd.concat(
+            [oryginal_df.reset_index(drop=True), annotation_df], axis=1
+        )
+        return result_df
+    else:
+        if output_format == "list":
+            return annotated_data
+        elif output_format == "dataframe":
+            return pd.DataFrame(annotated_data)
+        else:
+            raise ValueError(f"output_format must be one of {allowed_output_formats}")
+
+
+def annotate_variants_list(
+    variants: List[str],
+    genome: str = "hg38",
+    use_ensembl: bool = True,
+    use_refseq: bool = True,
+    flatten_consequences: bool = True,
+    batch_size: int = 500,
+    username: str = None,
+    api_key: str = None,
+    use_netrc: bool = True,
+    endpoint_url: str = "https://api.genebe.net/cloud/api-public/v1/variants",
+    progress_bar: bool = True,
+    omit_acmg: bool = False,
+    omit_csq: bool = False,
+    omit_basic: bool = False,
+    omit_advanced: bool = False,
+    omit_normalization: bool = False,
+    annotator: str = "snpeff",
+) -> List[Dict[str, object]]:
+    """
+    DEPRECIATED. Use annotate function. Annotates a list of genetic variants.
+
+    Args:
+        variants (List[str]): A list of genetic variants to be annotated in the format chr-pos-ref-alt.
+        genome (str, optional): The genome version for annotation (e.g., 'hg38'). Defaults to 'hg38'.
+        use_ensembl (bool, optional): Whether to use Ensembl for annotation. Defaults to True.
+        use_refseq (bool, optional): Whether to use RefSeq for annotation. Defaults to True.
+        flatten_consequences (bool, optional): If set to False, return consequences as a list of objects.
+            If set to True, only the most important consequence is returned in a flat form. Defaults to True.
+        batch_size (int, optional): The size of each batch for processing variants. Defaults to 500.
+            Must be smaller or equal to 1000.
+        username (str, optional): The username for authentication. Defaults to None.
+        api_key (str, optional): The API key for authentication. Defaults to None.
+        use_netrc (bool, optional): Whether to use credentials from the user's .netrc file for authentication.
+            Defaults to True.
+        endpoint_url (str, optional): The API endpoint for variant annotation.
+            Defaults to 'https://api.genebe.net/cloud/api-public/v1/variants'.
+        progress_bar (bool, optional): Show progress bar. Defaults to True.
+        omit_acmg (bool, optional): Don't add ACMG scores in the output. Defaults to False.
+        omit_csq (bool, optional): Don't add consequences in the output. Defaults to False.
+        omit_basic (bool, optional): Don't add basic annotations (GnomAD frequencies etc) in the output.
+            Defaults to False.
+        omit_advanced (bool, optional): Don't add advanced annotations (ClinVar etc) in the output.
+            Defaults to False.
+        omit_normalization (bool, optional): Don't normalize variants. Use only if you are sure they are normalized already.
+            Defaults to False.
+        annotator (str, optional): Which VEP implementation to use. Defaults to 'snpeff'.
+
+    Returns:
+        List[Dict[str, object]]: A list of dictionaries containing annotation information for each variant.
+
+    Example:
+        >>> variants = ["7-69599651-A-G", "6-160585140-T-G"]
+        >>> annotations = annotate_variants_list(variants, use_ensembl=True,
+        ...                                      use_refseq=False, genome='hg38',
+        ...                                      batch_size=500, username="user123@example.com",
+        ...                                      api_key="apikey456", use_netrc=False,
+        ...                                      endpoint_url='https://api.genebe.net/cloud/api-public/v1/variants')
+        >>> print(annotations)
+        [{'chr': '7', 'pos': 69599651, ... }, {'chr': '6', 'pos': 160585140, ... }]
+
+    Note:
+        - The number of elements in the returned list is always equal to the number of queries.
+    """
+
+    # Call the annotate function with the variants and args
+    annotated_variants = annotate(
+        variants,
+        genome=genome,
+        use_ensembl=use_ensembl,
+        use_refseq=use_refseq,
+        flatten_consequences=flatten_consequences,
+        batch_size=batch_size,
+        username=username,
+        api_key=api_key,
+        use_netrc=use_netrc,
+        endpoint_url=endpoint_url,
+        progress_bar=progress_bar,
+        omit_acmg=omit_acmg,
+        omit_csq=omit_csq,
+        omit_basic=omit_basic,
+        omit_advanced=omit_advanced,
+        omit_normalization=omit_normalization,
+        annotator=annotator,
+        output_format="list",
+    )
+
+    # Ensure the output is a pandas DataFrame
+    if isinstance(annotated_variants, list):
+        return annotated_variants
+    else:
+        raise ValueError("The output of annotate function is not a list.")
 
 
 def annotate_variants_list_to_dataframe(
@@ -332,23 +489,52 @@ def annotate_variants_list_to_dataframe(
     use_netrc: bool = True,
     endpoint_url: str = "https://api.genebe.net/cloud/api-public/v1/variants",
 ) -> pd.DataFrame:
-    # Call the existing function
-    result_list = annotate_variants_list(
-        variants=variants,
+    """
+    DEPRECIATED. Use annotate function.
+    Annotates a list of variants and returns the annotations as a pandas DataFrame.
+
+    Parameters:
+        variants (List[str]): A list of variant identifiers.
+        use_ensembl (bool, optional): Whether to use Ensembl for annotation. Defaults to True.
+        use_refseq (bool, optional): Whether to use RefSeq for annotation. Defaults to True.
+        genome (str, optional): The genome version for annotation (e.g., 'hg38'). Defaults to 'hg38'.
+        batch_size (int, optional): The size of each batch for processing variants. Defaults to 100.
+        flatten_consequences (bool, optional): If set to False, return consequences as a list of objects.
+                                               If set to True, only the most important consequence is returned in a flat form. Defaults to True.
+        username (str, optional): The username for authentication. Defaults to None.
+        api_key (str, optional): The API key for authentication. Defaults to None.
+        use_netrc (bool, optional): Whether to use credentials from the user's .netrc file for authentication. Defaults to True.
+        endpoint_url (str, optional): The API endpoint for variant annotation. Defaults to 'https://api.genebe.net/cloud/api-public/v1/variants'.
+
+    Returns:
+        pd.DataFrame: A pandas DataFrame containing the annotated variants.
+
+    Raises:
+        ValueError: If the output of the annotate function is not a pandas DataFrame.
+
+    Example:
+        >>> df = annotate_variants_list_to_dataframe(variants=["variant1", "variant2"])
+        >>> print(df.head())
+    """
+    annotated_variants = annotate(
+        variants,
+        genome=genome,
         use_ensembl=use_ensembl,
         use_refseq=use_refseq,
         flatten_consequences=flatten_consequences,
-        genome=genome,
         batch_size=batch_size,
         username=username,
         api_key=api_key,
         use_netrc=use_netrc,
         endpoint_url=endpoint_url,
+        output_format="dataframe",
     )
 
-    # Convert the list of dictionaries to a Pandas DataFrame
-    df = pd.DataFrame(result_list)
-    return df
+    # Ensure the output is a pandas DataFrame
+    if isinstance(annotated_variants, pd.DataFrame):
+        return annotated_variants
+    else:
+        raise ValueError("The output of annotate function is not a pandas DataFrame.")
 
 
 class DnaChange:
@@ -565,8 +751,7 @@ def annotate_dataframe_variants(df: pd.DataFrame, **kwargs) -> pd.DataFrame:
     Annotates genetic variants in a DataFrame using the 'annotate_variants_list_to_dataframe' function.
 
     Args:
-        df (pd.DataFrame): Input DataFrame with genetic variant information. Must contain columns
-        ["chr", "pos", "ref", "alt"]
+        df (pd.DataFrame): Input DataFrame with genetic variant information. Must contain columns ["chr", "pos", "ref", "alt"].
         **kwargs: Additional keyword arguments to pass to 'annotate_variants_list_to_dataframe'.
 
     Returns:
@@ -574,31 +759,27 @@ def annotate_dataframe_variants(df: pd.DataFrame, **kwargs) -> pd.DataFrame:
 
     Example:
         >>> df = pd.DataFrame({'chr': ['6', '22'], 'pos': [160585140, 28695868], 'ref': ['T', 'AG'], 'alt': ['G', 'A']})
-        >>> annotated_df = annotate_dataframe_variants(df, genome='hg38',use_ensembl=False,use_refseq=True, genome='hg38', flatten_consequences=True)
+        >>> annotated_df = annotate_dataframe_variants(df, genome='hg38', use_ensembl=False, use_refseq=True, flatten_consequences=True)
         >>> print(annotated_df)
+
+    Raises:
+        ValueError: If the input DataFrame does not contain the required columns.
     """
-    # Ensure required columns are present in the DataFrame
-    required_columns = ["chr", "pos", "ref", "alt"]
-    missing_columns = [col for col in required_columns if col not in df.columns]
-    if missing_columns:
-        raise ValueError(f"Missing required columns in DataFrame: {missing_columns}")
+    required_columns = {"chr", "pos", "ref", "alt"}
+    if not required_columns.issubset(df.columns):
+        raise ValueError(
+            f"Input DataFrame must contain the following columns: {required_columns}"
+        )
 
-    # Create a list of variant strings by concatenating columns
-    variant_strings = [
-        f"{row['chr']}-{row['pos']}-{row['ref']}-{row['alt']}"
-        for _, row in df.iterrows()
-    ]
+    # Prepare variants list in the required format
+    variants = df.apply(
+        lambda row: f"{row['chr']}-{row['pos']}-{row['ref']}-{row['alt']}", axis=1
+    ).tolist()
 
-    # Annotate variants using 'annotate_variants_list_to_dataframe'
-    annotation_df = annotate_variants_list_to_dataframe(
-        variants=variant_strings, **kwargs
-    )
-    annotation_df = annotation_df.drop(columns=["chr", "pos", "ref", "alt"])
+    # Call the annotate_variants_list_to_dataframe function with the prepared variants and additional kwargs
+    annotated_df = annotate_variants_list_to_dataframe(variants, **kwargs)
 
-    # Join the original DataFrame with the annotation results
-    result_df = pd.concat([df.reset_index(drop=True), annotation_df], axis=1)
-
-    return result_df
+    return annotated_df
 
 
 def whoami(

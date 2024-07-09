@@ -1,6 +1,4 @@
-import logging
-from itertools import islice
-from .client import annotate_variants_list
+from .client import annotate
 from typing import Optional
 import jsonlines
 from tqdm import tqdm
@@ -78,7 +76,7 @@ def annotate_json(
                         for variant in batch
                     ]
 
-                    annotated_variants = annotate_variants_list(
+                    annotated_variants = annotate(
                         variants_batch,
                         genome=genome,
                         use_ensembl=use_ensembl,
@@ -123,7 +121,7 @@ def annotate_json(
                 for variant in batch
             ]
 
-            annotated_variants = annotate_variants_list(
+            annotated_variants = annotate(
                 variants_batch,
                 genome=genome,
                 use_ensembl=use_ensembl,
