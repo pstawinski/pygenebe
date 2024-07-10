@@ -24,6 +24,26 @@ def test_annotate_with_list():
     )  # Ensure number of annotations matches number of variants
 
 
+def test_annotate_with_list_custom_annotations():
+    # Test annotate with list of variants
+    variants = ["7-69599651-A-G", "6-160585140-T-G"]
+    annotations = annotate(
+        variants,
+        use_ensembl=True,
+        use_refseq=False,
+        genome="hg38",
+        batch_size=500,
+        flatten_consequences=True,
+        use_netrc=True,
+        output_format="list",
+        custom_annotations=["AC_gnomad4", "AN_gnomad4"],
+    )
+    print("Annotations (list format) with custom annotations:")
+    print(annotations)
+    assert isinstance(annotations, list)
+    assert len(annotations) == len(variants)
+
+
 def test_annotate_with_dataframe():
 
     # Test annotate with pandas DataFrame
@@ -86,8 +106,7 @@ def test_parse_spdi():
         username=None,
         api_key=None,
         use_netrc=True,
-        # endpoint_url="https://api.genebe.net/cloud/api-public/v1/spdi",
-        endpoint_url="http://localhost:7180/cloud/api-public/v1/spdi",
+        endpoint_url="https://api.genebe.net/cloud/api-public/v1/spdi",
     )
     print("SPDI Annotations:")
     print(annotations)
@@ -100,11 +119,8 @@ def test_parse_spdi():
 
 
 if __name__ == "__main__":
-    test_annotate_with_dataframe()
-
-
-if __name__ == "__main__":
     test_annotate_with_list()
+    test_annotate_with_list_custom_annotations()
     test_annotate_with_dataframe()
     test_parse_hgvs()
     test_parse_spdi()

@@ -100,6 +100,14 @@ class PositionEncoder:
         return chromosome  # You may need to implement your normalization logic here
 
 
+# Singleton instance of PositionEncoder
+_position_encoder_instance = PositionEncoder()
+
+
+def encode_vcf_position_gbid(chromosome, position):
+    return _position_encoder_instance.encode_1_based_without_throw(chromosome, position)
+
+
 class VariantIdEncoder:
     RADIX = 36
     MAX_DEL_LENGTH = (2**7) - 1
@@ -239,6 +247,14 @@ class VariantIdEncoder:
                 encoded = self.set_value(encoded, self.MASK_INS, encodedAlt)
                 # print('7'+bin(encoded))
                 return encoded
+
+
+# Singleton instance of PositionEncoder
+_variant_encoder_instance = VariantIdEncoder()
+
+
+def encode_vcf_variant_gbid(chromosome, position):
+    return _variant_encoder_instance.encode1based(chromosome, position)
 
 
 # v = VariantIdEncoder()

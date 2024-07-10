@@ -135,6 +135,7 @@ def annotate(
     omit_normalization: bool = False,
     annotator: str = "snpeff",
     output_format: str = "list",
+    custom_annotations: List[str] = None,
 ) -> Union[List[Dict[str, object]], pd.DataFrame]:
     """
     Annotates genetic variants.
@@ -164,7 +165,7 @@ def annotate(
         omit_advanced (bool): Don't add advanced annotations (ClinVar etc) in the output. Defaults to False.
         omit_normalization (bool): Don't normalize variants. Use only if you are sure they are normalized already. Defaults to False.
         annotator (str): Which VEP implementation to use. Defaults to snpeff.
-        output_format (str): The desired format of the output, either 'list' for a list of
+        custom_annotations (List[str]): A list of custom annotations to include in the output. Consult with the documentation for the list of available custom annotations.       output_format (str): The desired format of the output, either 'list' for a list of
             dictionaries or 'dataframe' for a pandas DataFrame. Defaults to 'list'.
             If input is a dataframe, then ignored and returns a dataframe.
 
@@ -302,6 +303,8 @@ def annotate(
             params["omitNormalization"] = omit_normalization
         if annotator:
             params["annotator"] = annotator
+        if custom_annotations:
+            params["customAnnotations"] = ",".join(custom_annotations)
 
         # Make API request
         response = requests.post(

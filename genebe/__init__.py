@@ -1,6 +1,10 @@
 # may be empty
 
-from .gbid import PositionEncoder, VariantIdEncoder
+from .gbid import (
+    encode_vcf_position_gbid,
+    encode_vcf_variant_gbid,
+)
+
 from .client import (
     annotate_variants_list,
     annotate_variants_list_to_dataframe,
