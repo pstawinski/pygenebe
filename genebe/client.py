@@ -746,6 +746,101 @@ def parse_hgvs(
     return result
 
 
+def parse_spdi(
+    spdi: List[str],
+    genome: str = "hg38",
+    batch_size: int = 500,
+    username: str = None,
+    api_key: str = None,
+    use_netrc: bool = True,
+    endpoint_url: str = "https://api.genebe.net/cloud/api-public/v1/spdi",
+) -> List[str]:
+    """
+    Parses a list of genetic variants encoded in SPDI.
+
+    Args:
+        spdi (List[str]): A list of genetic variants in spdi format.
+        genome (str, optional): The genome build to use. Defaults to 'hg38'.
+        batch_size (int, optional): The size of each batch for processing variants.
+            Defaults to 500. Must be smaller or equal to 1000.
+        username (str, optional): The username for authentication.
+            Defaults to None.
+        api_key (str, optional): The API key for authentication.
+            Defaults to None.
+        use_netrc (bool, optional): Whether to use credentials from the user's
+            .netrc file for authentication. Defaults to True.
+        endpoint_url (str, optional): The API endpoint for parsing spdi.
+            Defaults to 'https://api.genebe.net/cloud/api-public/v1/spdi'.
+
+    Returns:
+        List[str]: A list of dictionaries containing annotation information
+        for each variant. Check the current documentation
+        on https://genebe.net/about/api
+
+    Example:
+        >>> spdi_variants = ["chrX:153803771:1:A"]
+        >>> variants = parse_spdi(spdi_variants)
+        >>> print(variants)
+        ['X-153803772-C-A']
+
+    Note:
+        - The number of the elements in the returned list is always equal to the number of queries.
+        If some position cannot be parsed, an empty string is returned.
+    """
+
+    # logging in
+    auth = None
+    result = []
+
+    for i in tqdm(range(0, len(spdi), batch_size)):
+        # Prepare data for API request
+        chunk = spdi[i : i + batch_size]
+
+        logging.debug("Querying for " + json.dumps(chunk))
+        # Make API request
+        response = requests.post(
+            endpoint_url,
+            json=chunk,
+            headers={
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "User-Agent": user_agent,
+            },
+            params={"genome": genome},
+            auth=auth,
+        )
+
+        # Check if request was successful
+        if response.status_code == 200:
+            api_results_raw = response.json()
+            logging.debug("Api result raw" + json.dumps(api_results_raw))
+            api_results = [
+                (
+                    f"{element.get('chr', '')}-{element.get('pos', '')}-{element.get('ref', '')}-{element.get('alt', '')}"
+                    if "chr" in element and "pos" in element
+                    else ""
+                )
+                for element in api_results_raw
+            ]
+
+            logging.debug("Backend result is " + json.dumps(api_results))
+
+            # Append API results to annotated_data
+            result.extend(api_results)
+        elif response.status_code == 429:
+            _handle_too_many_requests()
+        else:
+            logging.error(
+                f"Got response with code {response.status_code} with body "
+                + response.text
+            )
+            raise WrongServerResponseError(
+                f"Got response with code {response.status_code} with body "
+                + response.text
+            )
+    return result
+
+
 def annotate_dataframe_variants(df: pd.DataFrame, **kwargs) -> pd.DataFrame:
     """
     Annotates genetic variants in a DataFrame using the 'annotate_variants_list_to_dataframe' function.

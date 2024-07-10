@@ -1,4 +1,4 @@
-from genebe import annotate
+from genebe import annotate, parse_hgvs, parse_spdi
 
 import pandas as pd
 
@@ -55,6 +55,50 @@ def test_annotate_with_dataframe():
     )  # Ensure number of rows matches number of variants
 
 
+def test_parse_hgvs():
+    # Test parse_hgvs with a list of HGVS variants
+    hgvs_variants = ["NM_000277.2:c.1A>G", "NM_000277.2:c.2T>C"]
+    annotations = parse_hgvs(
+        hgvs_variants,
+        batch_size=500,
+        username=None,
+        api_key=None,
+        use_netrc=True,
+        endpoint_url="https://api.genebe.net/cloud/api-public/v1/hgvs",
+    )
+    print("HGVS Annotations:")
+    print(annotations)
+    assert isinstance(annotations, list)
+    assert len(annotations) == len(
+        hgvs_variants
+    )  # Ensure number of annotations matches number of variants
+    for annotation in annotations:
+        assert isinstance(annotation, str)  # Ensure each annotation is a string
+
+
+def test_parse_spdi():
+    # Test parse_spdi with a list of SPDI variants
+    spdi_variants = ["chrX:153803771:1:A"]
+    annotations = parse_spdi(
+        spdi_variants,
+        genome="hg38",
+        batch_size=500,
+        username=None,
+        api_key=None,
+        use_netrc=True,
+        # endpoint_url="https://api.genebe.net/cloud/api-public/v1/spdi",
+        endpoint_url="http://localhost:7180/cloud/api-public/v1/spdi",
+    )
+    print("SPDI Annotations:")
+    print(annotations)
+    assert isinstance(annotations, list)
+    assert len(annotations) == len(
+        spdi_variants
+    )  # Ensure number of annotations matches number of variants
+    for annotation in annotations:
+        assert isinstance(annotation, str)  # Ensure each annotation is a string
+
+
 if __name__ == "__main__":
     test_annotate_with_dataframe()
 
@@ -62,4 +106,6 @@ if __name__ == "__main__":
 if __name__ == "__main__":
     test_annotate_with_list()
     test_annotate_with_dataframe()
+    test_parse_hgvs()
+    test_parse_spdi()
     print("All tests passed!")

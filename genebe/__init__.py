@@ -5,6 +5,7 @@ from .client import (
     annotate_variants_list,
     annotate_variants_list_to_dataframe,
     parse_hgvs,
+    parse_spdi,
     annotate,
     annotate_dataframe_variants,
     whoami,
