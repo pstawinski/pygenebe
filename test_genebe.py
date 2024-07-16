@@ -1,4 +1,4 @@
-from genebe import annotate, parse_hgvs, parse_spdi
+from genebe import annotate, parse_variants
 
 import pandas as pd
 
@@ -75,44 +75,33 @@ def test_annotate_with_dataframe():
     )  # Ensure number of rows matches number of variants
 
 
-def test_parse_hgvs():
-    # Test parse_hgvs with a list of HGVS variants
-    hgvs_variants = ["NM_000277.2:c.1A>G", "NM_000277.2:c.2T>C"]
-    annotations = parse_hgvs(
-        hgvs_variants,
-        batch_size=500,
-        username=None,
-        api_key=None,
-        use_netrc=True,
-        endpoint_url="https://api.genebe.net/cloud/api-public/v1/hgvs",
-    )
-    print("HGVS Annotations:")
-    print(annotations)
-    assert isinstance(annotations, list)
-    assert len(annotations) == len(
-        hgvs_variants
-    )  # Ensure number of annotations matches number of variants
-    for annotation in annotations:
-        assert isinstance(annotation, str)  # Ensure each annotation is a string
-
-
-def test_parse_spdi():
+def test_parse_variants():
     # Test parse_spdi with a list of SPDI variants
-    spdi_variants = ["chrX:153803771:1:A"]
-    annotations = parse_spdi(
-        spdi_variants,
+    variants = [
+        "chrX:153803771:1:A",
+        "22 28695868 AG A",
+        "22-28695869--G",
+        "22-28695869-G-",
+        "NM_000277.2:c.1A>G",
+        "NM_000277.2:c.2T>C",
+        "AGT M259T",
+        "rs1228544607",
+        "wadliwy",
+    ]
+    annotations = parse_variants(
+        variants,
         genome="hg38",
         batch_size=500,
         username=None,
         api_key=None,
         use_netrc=True,
-        endpoint_url="https://api.genebe.net/cloud/api-public/v1/spdi",
+        endpoint_url="https://api.genebe.net/cloud/api-public/v1/convert",
     )
-    print("SPDI Annotations:")
+    print("Variants:")
     print(annotations)
     assert isinstance(annotations, list)
     assert len(annotations) == len(
-        spdi_variants
+        variants
     )  # Ensure number of annotations matches number of variants
     for annotation in annotations:
         assert isinstance(annotation, str)  # Ensure each annotation is a string
@@ -122,6 +111,5 @@ if __name__ == "__main__":
     test_annotate_with_list()
     test_annotate_with_list_custom_annotations()
     test_annotate_with_dataframe()
-    test_parse_hgvs()
-    test_parse_spdi()
+    test_parse_variants()
     print("All tests passed!")

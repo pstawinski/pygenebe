@@ -100,9 +100,17 @@ df = gnb.annotate(input_variants,
     output_format="dataframe")
 
 
-# parse HGVS
-input_hgvs = ['NM_000277.2:c.1A>G']
-parsed_variants = gnb.parse_hgvs(input_hgvs)
+# parse HGVS, SPDI or other
+input_variants_parse = [
+    "chrX:153803771:1:A",
+    "22 28695868 AG A",
+    "22-28695869--G",
+    "22-28695869-G-",
+    "NM_000277.2:c.1A>G",
+    "NM_000277.2:c.2T>C",
+    "AGT M259T",
+    "rs1228544607"]
+parsed_variants = gnb.parse_variants(input_variants_parse, genome="hg38")
 
 # annotate existing dataframe, using it's chr, pos, ref, alt columns and adding new columns
 df = pd.DataFrame({'chr': ['6', '22'], 'pos': [160585140, 28695868], 'ref': ['T', 'AG'], 'alt': ['G', 'A']})

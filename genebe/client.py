@@ -165,7 +165,8 @@ def annotate(
         omit_advanced (bool): Don't add advanced annotations (ClinVar etc) in the output. Defaults to False.
         omit_normalization (bool): Don't normalize variants. Use only if you are sure they are normalized already. Defaults to False.
         annotator (str): Which VEP implementation to use. Defaults to snpeff.
-        custom_annotations (List[str]): A list of custom annotations to include in the output. Consult with the documentation for the list of available custom annotations.       output_format (str): The desired format of the output, either 'list' for a list of
+        custom_annotations (List[str]): A list of custom annotations to include in the output. Consult with the documentation for the list of available custom annotations.
+        output_format (str): The desired format of the output, either 'list' for a list of
             dictionaries or 'dataframe' for a pandas DataFrame. Defaults to 'list'.
             If input is a dataframe, then ignored and returns a dataframe.
 
@@ -656,19 +657,20 @@ def lift_over_variants(
     return result
 
 
-def parse_hgvs(
-    hgvs: List[str],
+def parse_variants(
+    ids: List[str],
     batch_size: int = 500,
     username: str = None,
     api_key: str = None,
     use_netrc: bool = True,
-    endpoint_url: str = "https://api.genebe.net/cloud/api-public/v1/hgvs",
+    genome: str = "hg38",
+    endpoint_url: str = "https://api.genebe.net/cloud/api-public/v1/convert",
 ) -> List[str]:
     """
-    Parses a list of genetic variants encoded in HGVS.
+    Parses a list of genetic variants encoded in HGVS, SPDI, rs* or other format.
 
     Args:
-        hgvs (List[str]): A list of genetic variants in hgvs format.
+        ids (List[str]): A list of genetic variants in hgvs format.
             Supports .n:, .c:, .g: and .m:. Look at examples below.
         batch_size (int, optional): The size of each batch for processing variants.
             Defaults to 500. Must be smaller or equal 1000.
@@ -679,7 +681,7 @@ def parse_hgvs(
         use_netrc (bool, optional): Whether to use credentials from the user's
             .netrc file for authentication. Defaults to True.
         endpoint_url (str, optional): The API endpoint for parsing hgvs.
-            Defaults to 'https://api.genebe.net/cloud/api-public/v1/hgvs'.
+            Defaults to 'https://api.genebe.net/cloud/api-public/v1/convert'.
 
     Returns:
         List[str]: A list of dictionaries containing annotation information
@@ -687,10 +689,10 @@ def parse_hgvs(
         on https://genebe.net/about/api
 
     Example:
-        >>> hgvs_variants = ["'NM_000277.2:c.1A>G"]
-        >>> variants = parse_hgvs(hgvs_variants)
+        >>> input_variants = ["'NM_000277.2:c.1A>G", "22 28695868 AG A", "rs1228544607", "AGT Met259Thr"]
+        >>> variants = parse_variants(input_variants)
         >>> print(variants)
-        ['12-102917129-AT-AC', '12-102852850-GA-G']
+        ['12-102917129-AT-AC', '12-102852850-GA-G', ']
 
     Note:
         - The number of the elements in returned list is always equal to the number of queries.
@@ -701,9 +703,9 @@ def parse_hgvs(
     auth = None
     result = []
 
-    for i in tqdm(range(0, len(hgvs), batch_size)):
+    for i in tqdm(range(0, len(ids), batch_size)):
         # Prepare data for API request
-        chunk = hgvs[i : i + batch_size]
+        chunk = ids[i : i + batch_size]
 
         logging.debug("Querying for " + json.dumps(chunk))
         # Make API request
@@ -715,6 +717,7 @@ def parse_hgvs(
                 "Content-Type": "application/json",
                 "User-Agent": user_agent,
             },
+            params={genome: genome},
             auth=auth,
         )
 
@@ -722,111 +725,20 @@ def parse_hgvs(
         if response.status_code == 200:
             api_results_raw = response.json()
             logging.debug("Api reqult raw" + json.dumps(api_results_raw))
-            api_results = [
-                (
-                    f"{element.get('chr', '')}-{element.get('pos', '')}-{element.get('ref', '')}-{element.get('alt', '')}"
-                    if "chr" in element and "pos" in element
-                    else ""
-                )
-                for element in api_results_raw
-            ]
+            api_results = []
 
-            logging.debug("Backend result is " + json.dumps(api_results))
-
-            # Append API results to annotated_data
-            result.extend(api_results)
-        elif response.status_code == 429:
-            _handle_too_many_requests()
-        else:
-            logging.error(
-                f"Got response with code {response.status_code} with body "
-                + response.text
-            )
-            raise WrongServerResponseError(
-                f"Got response with code {response.status_code} with body "
-                + response.text
-            )
-    return result
-
-
-def parse_spdi(
-    spdi: List[str],
-    genome: str = "hg38",
-    batch_size: int = 500,
-    username: str = None,
-    api_key: str = None,
-    use_netrc: bool = True,
-    endpoint_url: str = "https://api.genebe.net/cloud/api-public/v1/spdi",
-) -> List[str]:
-    """
-    Parses a list of genetic variants encoded in SPDI.
-
-    Args:
-        spdi (List[str]): A list of genetic variants in spdi format.
-        genome (str, optional): The genome build to use. Defaults to 'hg38'.
-        batch_size (int, optional): The size of each batch for processing variants.
-            Defaults to 500. Must be smaller or equal to 1000.
-        username (str, optional): The username for authentication.
-            Defaults to None.
-        api_key (str, optional): The API key for authentication.
-            Defaults to None.
-        use_netrc (bool, optional): Whether to use credentials from the user's
-            .netrc file for authentication. Defaults to True.
-        endpoint_url (str, optional): The API endpoint for parsing spdi.
-            Defaults to 'https://api.genebe.net/cloud/api-public/v1/spdi'.
-
-    Returns:
-        List[str]: A list of dictionaries containing annotation information
-        for each variant. Check the current documentation
-        on https://genebe.net/about/api
-
-    Example:
-        >>> spdi_variants = ["chrX:153803771:1:A"]
-        >>> variants = parse_spdi(spdi_variants)
-        >>> print(variants)
-        ['X-153803772-C-A']
-
-    Note:
-        - The number of the elements in the returned list is always equal to the number of queries.
-        If some position cannot be parsed, an empty string is returned.
-    """
-
-    # logging in
-    auth = None
-    result = []
-
-    for i in tqdm(range(0, len(spdi), batch_size)):
-        # Prepare data for API request
-        chunk = spdi[i : i + batch_size]
-
-        logging.debug("Querying for " + json.dumps(chunk))
-        # Make API request
-        response = requests.post(
-            endpoint_url,
-            json=chunk,
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "User-Agent": user_agent,
-            },
-            params={"genome": genome},
-            auth=auth,
-        )
-
-        # Check if request was successful
-        if response.status_code == 200:
-            api_results_raw = response.json()
-            logging.debug("Api result raw" + json.dumps(api_results_raw))
-            api_results = [
-                (
-                    f"{element.get('chr', '')}-{element.get('pos', '')}-{element.get('ref', '')}-{element.get('alt', '')}"
-                    if "chr" in element and "pos" in element
-                    else ""
-                )
-                for element in api_results_raw
-            ]
-
-            logging.debug("Backend result is " + json.dumps(api_results))
+            for variants_dict in api_results_raw:
+                if "variants" in variants_dict and variants_dict["variants"]:
+                    variants = variants_dict["variants"]
+                    variant = variants[0]
+                    formatted_variant = f"{variant.get('chr', '')}-{variant.get('pos', '')}-{variant.get('ref', '')}-{variant.get('alt', '')}"
+                    api_results.append(formatted_variant)
+                else:
+                    error_message = variants_dict.get(
+                        "error", "No error message provided"
+                    )
+                    logging.warning(f"Warning: {error_message}")
+                    api_results.append("")
 
             # Append API results to annotated_data
             result.extend(api_results)
@@ -846,6 +758,8 @@ def parse_spdi(
 
 def annotate_dataframe_variants(df: pd.DataFrame, **kwargs) -> pd.DataFrame:
     """
+    DEPRECIATED, use annotate
+
     Annotates genetic variants in a DataFrame using the 'annotate_variants_list_to_dataframe' function.
 
     Args:
