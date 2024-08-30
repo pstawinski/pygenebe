@@ -21,7 +21,7 @@ def annotate_json(
     omit_basic: bool = False,
     omit_advanced: bool = False,
     omit_normalization: bool = False,
-    progress: bool = False,
+    progress_bar: bool = False,
 ):
     """
     Annotates a JSON file using the annotate_variants_list function.

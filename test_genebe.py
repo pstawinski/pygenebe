@@ -1,4 +1,4 @@
-from genebe import annotate, parse_variants
+from genebe import annotate, parse_variants, lift_over_variants
 
 import pandas as pd
 
@@ -75,6 +75,20 @@ def test_annotate_with_dataframe():
     )  # Ensure number of rows matches number of variants
 
 
+def test_lift_over():
+    variants = ["chr6-160585140-T-G", "chrX-200-C-G", "invalid_input_missing_dash"]
+
+    vars = lift_over_variants(
+        variants,
+        "hg19",
+        "hg38",
+        endpoint_url="http://localhost:7180/cloud/api-public/v1/liftover",
+    )
+
+    print("Lifted over variants:")
+    print(vars)
+
+
 def test_parse_variants():
     # Test parse_spdi with a list of SPDI variants
     variants = [
@@ -112,4 +126,5 @@ if __name__ == "__main__":
     test_annotate_with_list_custom_annotations()
     test_annotate_with_dataframe()
     test_parse_variants()
+    test_lift_over()
     print("All tests passed!")

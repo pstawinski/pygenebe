@@ -19,9 +19,11 @@ def account_command(args):
     )
     print(result)
 
+
 def version_command(args):
     # Add your login logic here
     print(f"GeneBe, version {__version__}")
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -133,9 +135,7 @@ def main():
     )
 
     # Subparser for the 'version' command
-    account_parser = subparsers.add_parser(
-        "version", help="Display client version"
-    )
+    account_parser = subparsers.add_parser("version", help="Display client version")
 
     args = parser.parse_args()
 
@@ -161,7 +161,7 @@ def main():
                 omit_basic=args.omit_basic,
                 omit_advanced=args.omit_advanced,
                 omit_normalization=args.omit_normalization,
-                progress=args.progress,
+                progress_bar=args.progress,
             )
         elif type == "json":
             annotate_json(
@@ -181,7 +181,7 @@ def main():
                 omit_basic=args.omit_basic,
                 omit_advanced=args.omit_advanced,
                 omit_normalization=args.omit_normalization,
-                progress=args.progress,
+                progress_bar=args.progress,
             )
         else:
             logging.error(

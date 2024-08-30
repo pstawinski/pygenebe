@@ -32,7 +32,7 @@ def annotate_vcf(
     omit_basic: bool = False,
     omit_advanced: bool = False,
     omit_normalization: bool = False,
-    progress: bool = False,
+    progress_bar: bool = False,
 ):
     """
     Annotates a VCF file using the annotate_variants_list function.
@@ -140,7 +140,6 @@ def annotate_vcf(
                 omit_basic=omit_basic,
                 omit_advanced=omit_advanced,
                 omit_normalization=omit_normalization,
-                progress=progress,
             )
 
             # Add ACMG scores to the variants and write to the output VCF file

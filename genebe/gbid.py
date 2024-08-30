@@ -253,8 +253,8 @@ class VariantIdEncoder:
 _variant_encoder_instance = VariantIdEncoder()
 
 
-def encode_vcf_variant_gbid(chromosome, position):
-    return _variant_encoder_instance.encode1based(chromosome, position)
+def encode_vcf_variant_gbid(chromosome, position, ref, alt):
+    return _variant_encoder_instance.encode1based(chromosome, position, ref, alt)
 
 
 # v = VariantIdEncoder()

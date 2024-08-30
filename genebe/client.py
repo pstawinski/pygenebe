@@ -541,14 +541,6 @@ def annotate_variants_list_to_dataframe(
         raise ValueError("The output of annotate function is not a pandas DataFrame.")
 
 
-class DnaChange:
-    def __init__(self, chr, pos, ref, alt):
-        self.chr = chr
-        self.pos = int(pos)
-        self.ref = ref
-        self.alt = alt
-
-
 def lift_over_variants(
     variants: List[str],
     from_genome: str = "hg19",
@@ -556,6 +548,7 @@ def lift_over_variants(
     username: str = None,
     api_key: str = None,
     use_netrc: bool = True,
+    progress: bool = True,
     endpoint_url: str = "https://api.genebe.net/cloud/api-public/v1/liftover",
 ) -> List[str]:
     """
@@ -571,6 +564,7 @@ def lift_over_variants(
             Defaults to None.
         use_netrc (bool, optional): Whether to use credentials from the user's
             .netrc file for authentication. Defaults to True.
+        progress (bool, optional): Show progress bar. Defaults to True.
         endpoint_url (str, optional): The API endpoint.
             Defaults to 'https://api.genebe.net/cloud/api-public/v1/liftover'.
 
@@ -593,21 +587,7 @@ def lift_over_variants(
         "User-Agent": user_agent,
     }
 
-    # Parse input strings into DnaChange objects
-    dna_changes = [DnaChange(*variant.split("-")) for variant in variants]
-
-    # Prepare the payload
-    variants = [
-        {
-            "chr": dna_change.chr,
-            "pos": dna_change.pos,
-            "ref": dna_change.ref,
-            "alt": dna_change.alt,
-        }
-        for dna_change in dna_changes
-    ]
-
-    print(f"this is my payload: {json.dumps(variants)}")
+    vars = variants
 
     if (username is not None) and (api_key is not None):
         auth = (username, api_key)
@@ -631,9 +611,9 @@ def lift_over_variants(
     # Make the POST request
 
     result = []
-    for i in tqdm(range(0, len(variants), batch_size)):
+    for i in tqdm(range(0, len(vars), batch_size)):
         # Prepare data for API request
-        chunk = variants[i : i + batch_size]
+        chunk = vars[i : i + batch_size]
         response = requests.post(
             endpoint_url, params=params, json=chunk, headers=headers, auth=auth
         )
@@ -645,10 +625,10 @@ def lift_over_variants(
             result.extend(
                 (
                     f"{element.get('chr', '')}-{element.get('pos', '')}-{element.get('ref', '')}-{element.get('alt', '')}"
-                    if element.get("chr")
+                    if isinstance(element, dict) and element.get("chr")
                     else ""
                 )
-                for element in lifted_variants
+                for element in lifted_variants.get("variants")
             )
         else:
             # Print an error message if the request was not successful
@@ -663,6 +643,7 @@ def parse_variants(
     username: str = None,
     api_key: str = None,
     use_netrc: bool = True,
+    progress: bool = True,
     genome: str = "hg38",
     endpoint_url: str = "https://api.genebe.net/cloud/api-public/v1/convert",
 ) -> List[str]:
@@ -680,6 +661,7 @@ def parse_variants(
             Defaults to None.
         use_netrc (bool, optional): Whether to use credentials from the user's
             .netrc file for authentication. Defaults to True.
+        progress (bool, optional): Show progress bar. Defaults to True.
         endpoint_url (str, optional): The API endpoint for parsing hgvs.
             Defaults to 'https://api.genebe.net/cloud/api-public/v1/convert'.
 
