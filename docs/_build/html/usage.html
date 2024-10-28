@@ -49,7 +49,14 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#genebe-utils">GeneBe Utils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#command-line-usage">Command Line Usage</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#annotating-vcf-using-annotate-command">Annotating VCF using <cite>annotate</cite> command</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#annotating-vcf-using-annotate-command">Annotating VCF using <code class="docutils literal notranslate"><span class="pre">annotate</span></code> command</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#library-usage">Library usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#simple-annotation-of-genetic-variants">Simple annotation of genetic variants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#annotating-pandas-dataframe">Annotating pandas dataframe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parsing-hgvs">Parsing HGVS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#making-a-liftover">Making a liftover</a></li>
 </ul>
 </li>
 </ul>
@@ -75,7 +82,7 @@
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Usage</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/usage.md.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -96,23 +103,27 @@
 <li><p>ACMG score</p></li>
 <li><p>… if you need more, please let us know</p></li>
 </ul>
+<p>More examples and documentation one can find at https://genebe.net/about/api-pandas .</p>
 </section>
 <section id="command-line-usage">
 <h2>Command Line Usage<a class="headerlink" href="#command-line-usage" title="Link to this heading"></a></h2>
-<p>Check current options using <cite>–help</cite> switch:</p>
+<p>Check current options using <code class="docutils literal notranslate"><span class="pre">--help</span></code> switch:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>genebe<span class="w"> </span>--help
 genebe<span class="w"> </span>annotate<span class="w"> </span>--help
 </pre></div>
 </div>
 <section id="annotating-vcf-using-annotate-command">
-<h3>Annotating VCF using <cite>annotate</cite> command<a class="headerlink" href="#annotating-vcf-using-annotate-command" title="Link to this heading"></a></h3>
+<h3>Annotating VCF using <code class="docutils literal notranslate"><span class="pre">annotate</span></code> command<a class="headerlink" href="#annotating-vcf-using-annotate-command" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p><strong>WARNING!</strong> It is not recommended to annotate VCF files using the https://github.com/pstawinski/genebe-cli client.</p>
+</div></blockquote>
 <p>GeneBe client allows you to annotate your VCF file with ease. Use the following command:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>genebe<span class="w"> </span>annotate<span class="w"> </span>--input<span class="w"> </span>input.vcf.gz<span class="w"> </span>--output<span class="w"> </span>output.vcf.gz
 </pre></div>
 </div>
-<p>Remember that your VCF file must be in a single allelic format! Utilize bcftools (<a class="reference external" href="https://samtools.github.io/bcftools/">https://samtools.github.io/bcftools/</a>) to split the file. The output VCF will contain additional fields.</p>
-<p>To use VCF annotation, you have to have the <cite>cyvcf2</cite> package installed. Take a look at the Installation section below.</p>
-<p>If your VCF file is large (over 10,000 variants), you may encounter request limits. To avoid this, create a GeneBe account with an API Key and provide your login/key using the <cite>–username</cite> and <cite>–api-key</cite> arguments. You can always check your limits with the account command. Update your annotation command as follows:</p>
+<p>Remember that your VCF file must be in a single allelic format! Utilize bcftools (https://samtools.github.io/bcftools/) to split the file. The output VCF will contain additional fields.</p>
+<p>To use VCF annotation, you have to have the <code class="docutils literal notranslate"><span class="pre">cyvcf2</span></code> package installed. Take a look at the Installation section below.</p>
+<p>If your VCF file is large (over 10,000 variants), you may encounter request limits. To avoid this, create a GeneBe account with an API Key and provide your login/key using the <code class="docutils literal notranslate"><span class="pre">--username</span></code> and <code class="docutils literal notranslate"><span class="pre">--api-key</span></code> arguments. You can always check your limits with the account command. Update your annotation command as follows:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>genebe<span class="w"> </span>annotate<span class="w"> </span>--input<span class="w"> </span>input.vcf.gz<span class="w"> </span>--output<span class="w"> </span>output.vcf.gz<span class="w"> </span>--username<span class="w"> </span>your_username<span class="w"> </span>--api-key<span class="w"> </span>your_api_key
 </pre></div>
 </div>
@@ -120,6 +131,55 @@ genebe<span class="w"> </span>annotate<span class="w"> </span>--help
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>genebe<span class="w"> </span>annotate<span class="w"> </span>--help
 </pre></div>
 </div>
+</section>
+</section>
+<section id="library-usage">
+<h2>Library usage<a class="headerlink" href="#library-usage" title="Link to this heading"></a></h2>
+<section id="simple-annotation-of-genetic-variants">
+<h3>Simple annotation of genetic variants<a class="headerlink" href="#simple-annotation-of-genetic-variants" title="Link to this heading"></a></h3>
+<p>Example of annotating a single variant.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">genebe</span> <span class="k">as</span> <span class="nn">gnb</span>
+
+<span class="n">input_variants</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;7-69599651-A-G&#39;</span><span class="p">]</span>
+
+<span class="c1"># output as a list, with all transcripts</span>
+<span class="nb">list</span> <span class="o">=</span> <span class="n">gnb</span><span class="o">.</span><span class="n">annotate_variants_list</span><span class="p">(</span><span class="n">input_variants</span><span class="p">,</span><span class="n">flatten_consequences</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># output as a pandas dataframe, flat</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">gnb</span><span class="o">.</span><span class="n">annotate_variants_list_to_dataframe</span><span class="p">(</span><span class="n">input_variants</span><span class="p">,</span> <span class="n">flatten_consequences</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+</pre></div>
+</div>
+</section>
+<section id="annotating-pandas-dataframe">
+<h3>Annotating pandas dataframe<a class="headerlink" href="#annotating-pandas-dataframe" title="Link to this heading"></a></h3>
+<p>If you have a pandas dataframe named <code class="docutils literal notranslate"><span class="pre">df</span></code> with columns <code class="docutils literal notranslate"><span class="pre">chr</span></code>, <code class="docutils literal notranslate"><span class="pre">pos</span></code>, <code class="docutils literal notranslate"><span class="pre">ref</span></code>, <code class="docutils literal notranslate"><span class="pre">alt</span></code> then annotating it with variant consequences etc. is as easy as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">genebe</span> <span class="k">as</span> <span class="nn">gnb</span>
+<span class="n">annotated</span> <span class="o">=</span> <span class="n">gnb</span><span class="o">.</span><span class="n">annotate_dataframe_variants</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">use_ensembl</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">use_refseq</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">genome</span><span class="o">=</span><span class="s1">&#39;hg38&#39;</span><span class="p">,</span> <span class="n">flatten_consequences</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="parsing-hgvs">
+<h3>Parsing HGVS<a class="headerlink" href="#parsing-hgvs" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">genebe</span> <span class="k">as</span> <span class="nn">gnb</span>
+<span class="c1"># parse HGVS</span>
+<span class="n">input_hgvs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NM_000277.2:c.1A&gt;G&#39;</span><span class="p">]</span>
+<span class="n">parsed_variants</span> <span class="o">=</span> <span class="n">gnb</span><span class="o">.</span><span class="n">parse_hgvs</span><span class="p">(</span><span class="n">input_hgvs</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="making-a-liftover">
+<h3>Making a liftover<a class="headerlink" href="#making-a-liftover" title="Link to this heading"></a></h3>
+<p>Simple lift genetic variants between hg19/hg38/T2T</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">genebe</span> <span class="k">as</span> <span class="nn">gnb</span>
+<span class="c1"># parse HGVS</span>
+<span class="n">input_hgvs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NM_000277.2:c.1A&gt;G&#39;</span><span class="p">]</span>
+<span class="n">gnb</span><span class="o">.</span><span class="n">lift_over_variants</span><span class="p">([</span><span class="s1">&#39;chr6-161006172-T-G&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+<p>Find more usage examples on GitHub https://github.com/pstawinski/pygenebe/tree/main/examples</p>
 </section>
 </section>
 </section>

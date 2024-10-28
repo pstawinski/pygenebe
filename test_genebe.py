@@ -1,4 +1,9 @@
-from genebe import annotate, parse_variants, lift_over_variants
+from genebe import (
+    annotate,
+    parse_variants,
+    lift_over_variants,
+    annotate_dataframe_variants,
+)
 
 import pandas as pd
 
@@ -87,6 +92,9 @@ def test_lift_over():
 
     print("Lifted over variants:")
     print(vars)
+    print(len(vars))
+    print(len(variants))
+    assert len(vars) == len(variants)
 
 
 def test_parse_variants():
@@ -121,10 +129,80 @@ def test_parse_variants():
         assert isinstance(annotation, str)  # Ensure each annotation is a string
 
 
+def test_annotate_variants_list_hg19():
+    # Test case
+    variants = ["1-12979845-T-C"]
+    annotations = annotate(
+        variants,
+        use_ensembl=True,
+        use_refseq=False,
+        genome="hg19",
+        batch_size=500,
+        use_netrc=False,
+        endpoint_url="https://api.genebe.net/cloud/api-public/v1/variants",
+    )
+
+    # Assertions
+    assert len(annotations) == len(variants)
+
+    anns = annotations[0]
+    print(anns)
+
+    assert anns["chr"] == "1"
+    assert anns["pos"] == 12920024
+
+
+def test_annotate_variants_list_hg19_impossible_liftover():
+    # Test case
+    variants = ["1-12979845-T-C", "1-13036247-T-A"]
+    annotations = annotate(
+        variants,
+        use_ensembl=True,
+        use_refseq=False,
+        genome="hg19",
+        batch_size=500,
+        use_netrc=False,
+        endpoint_url="https://api.genebe.net/cloud/api-public/v1/variants",
+        output_format="dataframe",
+    )
+
+    # Assertions
+    assert len(annotations) == len(variants)
+
+    # anns = annotations[0]
+    print(annotations)
+
+
+def test_annotate_variants_list_hg19_impossible_liftover_old_inteface():
+    # Test case
+    variants = ["1-12979845-T-C", "1-13036247-T-A"]
+
+    # Split each variant into its components and create a DataFrame
+    data = [variant.split("-") for variant in variants]
+    df = pd.DataFrame(data, columns=["chr", "pos", "ref", "alt"])
+
+    annotations = annotate_dataframe_variants(
+        df,
+        use_ensembl=True,
+        use_refseq=False,
+        genome="hg19",
+        batch_size=500,
+        use_netrc=False,
+        endpoint_url="https://api.genebe.net/cloud/api-public/v1/variants",
+    )
+
+    # Assertions
+    assert len(annotations) == len(variants)
+
+    # anns = annotations[0]
+    print(annotations)
+
+
 if __name__ == "__main__":
     test_annotate_with_list()
     test_annotate_with_list_custom_annotations()
     test_annotate_with_dataframe()
     test_parse_variants()
     test_lift_over()
+    test_annotate_variants_list_hg19_impossible_liftover()
     print("All tests passed!")

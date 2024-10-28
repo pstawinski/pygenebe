@@ -48,7 +48,11 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Limits ant troubleshooting</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Limits ant troubleshooting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#limits">Limits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#troubleshooting-and-issues">Troubleshooting and issues</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">genebe</a></li>
 </ul>
 
@@ -78,7 +82,36 @@
              
   <section id="limits-ant-troubleshooting">
 <h1>Limits ant troubleshooting<a class="headerlink" href="#limits-ant-troubleshooting" title="Link to this heading"></a></h1>
-<p>TODO</p>
+<section id="limits">
+<h2>Limits<a class="headerlink" href="#limits" title="Link to this heading"></a></h2>
+<p>If you wish to annotate thousands of variants, please log in to https://genebe.net, generate an API Key, and provide them using <code class="docutils literal notranslate"><span class="pre">username</span></code> and <code class="docutils literal notranslate"><span class="pre">api_key</span></code>.</p>
+<p>The number of daily requests from a single IP is restricted to prevent abuse and excessive resource consumption on our server. Account holders with an API Key enjoy significantly higher limits (in the tens of thousands). If you require a higher daily request limit, please reach out to us via the https://genebe.net .</p>
+<p>You can always check your current usage running</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>genebe<span class="w"> </span>account
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>genebe<span class="w"> </span>account<span class="w"> </span>--username<span class="w"> </span>YOUR_USERNAME<span class="w"> </span>--api_key<span class="w"> </span>YOUR_API_KEY
+</pre></div>
+</div>
+</section>
+<section id="troubleshooting-and-issues">
+<h2>Troubleshooting and issues<a class="headerlink" href="#troubleshooting-and-issues" title="Link to this heading"></a></h2>
+<p>Experiencing issues? Follow these steps:</p>
+<ol class="arabic simple">
+<li><p>Check Existing Issues:</p></li>
+</ol>
+<ul class="simple">
+<li><p>If you encounter problems, explore existing issues on GitHub https://github.com/pstawinski/pygenebe for possible solutions.</p></li>
+</ul>
+<ol class="arabic simple" start="2">
+<li><p>Report New Issues:</p></li>
+</ol>
+<ul class="simple">
+<li><p>Unable to find a resolution? You can report the problem by creating a new issue with a clear description and details on https://github.com/pstawinski/pygenebe .</p></li>
+</ul>
+<p>Your feedback is crucial for improving GeneBe client. Thank you for contributing to the community!</p>
+</section>
 </section>
 
 

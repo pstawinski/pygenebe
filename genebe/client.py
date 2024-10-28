@@ -20,7 +20,7 @@ except ImportError:
 
 # Set up the User-Agent header
 user_agent = f"GeneBe/{__version__} (requests)"
-apikey_username_warning_showed = False
+apikey_username_showed = False
 
 
 class TooManyRequestsError(Exception):
@@ -51,7 +51,7 @@ def _parse_variant_string(s):
         pos = int(pos)
         return {"chr": chr_, "pos": pos, "ref": ref, "alt": alt}
     else:
-        print(f"Error: Invalid format in [{s}]")
+        print(f"Warning: Invalid format in [{s}], not annotating.")
         return None
 
 
@@ -82,7 +82,8 @@ def _get_machine_name_from_endpoint(endpoint):
         str: The machine name extracted from the endpoint.
     """
     parsed_url = urlparse(endpoint)
-    return parsed_url.netloc
+    machine_name = parsed_url.netloc.split(":")[0]
+    return machine_name
 
 
 def _read_netrc_credentials(endpoint):
@@ -260,16 +261,19 @@ def annotate(
         auth = None
 
     # if username:
-    if api_key == None:
-        global apikey_username_warning_showed
-        if not apikey_username_warning_showed:
-            # show it only once
+    global apikey_username_showed
+
+    if api_key is None:
+        if not apikey_username_showed:
+            # Show it only once
             logging.warning(
-                f"You are not logged in to GeneBe. We recommend using username and api_key arguments. Find out more on https://genebe.net/api ."
+                "You are not logged in to GeneBe. We recommend using username and api_key arguments. Find out more on https://genebe.net/api ."
             )
-            apikey_username_warning_showed = True
+            apikey_username_showed = True
     else:
-        logging.warning(f"you will log in {username}")
+        if not apikey_username_showed:
+            logging.info(f"I will try to log in as {username}")
+            apikey_username_showed = True
 
     # input data validation
     # Convert the list of strings to list of dictionaries

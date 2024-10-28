@@ -4,6 +4,8 @@ from .client import annotate
 from typing import Optional
 from tqdm import tqdm
 
+# Configure logging to print INFO level and above
+logging.basicConfig(level=logging.INFO)
 
 try:
     # try with a fast c-implementation ...
@@ -11,7 +13,7 @@ try:
 except ImportError:
     # ... otherwise fallback python implementation
     logging.error(
-        'No cyvcf2 module installed. Install, f.ex. by executing "pip install cyvcf2".'
+        'No cyvcf2 module installed. Some features are not available. Install it executing "pip install cyvcf2".'
     )
 
 
@@ -67,6 +69,10 @@ def annotate_vcf(
         progress (bool, optional): Show progress bar
     """
 
+    logging.info(
+        f"Welcome. Annotating VCF file for genome {genome}. Ensure that VCF file has biallelic form."
+    )
+
     # Open VCF file
     vcf_reader = cyvcf2.VCF(input_vcf_path)
 
@@ -107,8 +113,14 @@ def annotate_vcf(
     # Open the output VCF file for writing
     vcf_writer = cyvcf2.Writer(output_vcf_path, vcf_reader)
 
-    # Batch size for reading variants
-    batch_size = 1000
+    # Batch size for reading variants, if greater than 1000 limit to 1000
+    if batch_size > 1000:
+        batch_size = 1000
+        logging.warning("Batch size is limited to 1000")
+
+    if batch_size < 10:
+        batch_size = 10
+        logging.warning("Batch size must be greater than 10")
 
     with tqdm() as pbar:
         # Iterate over variants in batches
@@ -117,6 +129,13 @@ def annotate_vcf(
             batch = list(islice(vcf_reader, batch_size))
             if not batch:
                 break  # Break if there are no more variants
+
+            # identify variant.ALT that has more than 1 element
+            for variant in batch:
+                if len(variant.ALT) > 1:
+                    raise ValueError(
+                        f"Variant {variant.CHROM}-{variant.POS}-{variant.REF}-{variant.ALT} has more than 1 ALT. You have to split multi-allelic variants before annotating for example using bcftools: `bcftools norm -m -any input.vcf -o output_split.vcf`."
+                    )
 
             # Process the batch
             variants_batch = [
