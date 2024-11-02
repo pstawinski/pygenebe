@@ -81,7 +81,7 @@ annotated = gnb.annotate_dataframe_variants(df,use_ensembl=False,use_refseq=True
 import genebe as gnb
 # parse HGVS
 input_hgvs = ['NM_000277.2:c.1A>G']
-parsed_variants = gnb.parse_hgvs(input_hgvs)
+parsed_variants = gnb.parse_variants(input_hgvs)
 ```
 
 ### Making a liftover
