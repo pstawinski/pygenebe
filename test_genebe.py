@@ -3,9 +3,19 @@ from genebe import (
     parse_variants,
     lift_over_variants,
     annotate_dataframe_variants,
+    encode_vcf_variant_gbid,
 )
 
 import pandas as pd
+
+
+def test_gbid_generation():
+    chr = "1"
+    pos = 16044378
+    ref = "C"
+    alt = "CACACACACAT"
+    encoded = encode_vcf_variant_gbid(chr, pos, ref, alt)
+    assert encoded == 17227519582999023
 
 
 def test_annotate_with_list():
@@ -199,6 +209,7 @@ def test_annotate_variants_list_hg19_impossible_liftover_old_inteface():
 
 
 if __name__ == "__main__":
+    test_gbid_generation()
     test_annotate_with_list()
     test_annotate_with_list_custom_annotations()
     test_annotate_with_dataframe()

@@ -127,6 +127,13 @@ class VariantIdEncoder:
 
     positionEncoder = PositionEncoder()
 
+    def hash_function(self, input_string: str, seed: int = 104729) -> int:
+        # Compute the 128-bit hash from the input string using MurmurHash3 (hash128 returns a single 128-bit integer)
+        hash_value = mmh3.hash128(input_string, seed)
+        # Extract the high 64 bits and low 64 bits from the 128-bit hash
+        low_part = hash_value & 0xFFFFFFFFFFFFFFFF  # Mask to get the lower 64 bits
+        return low_part
+
     def set_value(self, input, mask, value):
         shift_count = (mask & -mask).bit_length() - 1
         new_value = (input & ~mask) | ((value << shift_count) & mask)
@@ -158,13 +165,13 @@ class VariantIdEncoder:
 
     def hash(self, chromosome, position, del_length, alt):
         change = f"{chromosome}:{position}:{del_length}:{alt}"
-        hash_value = mmh3.hash128(change.encode("utf-8"))
+        hash_value = self.hash_function(change.encode("utf-8"))
         value = self.set_value(hash_value, self.MASK_HASH, 1)
         return value
 
     def change_hash(self, del_length, alt):
         change = f"{del_length}:{alt}"
-        hash_value = mmh3.hash128(change.encode("utf-8"))
+        hash_value = self.hash_function(change.encode("utf-8"))
         value = hash_value & self.MASK_CHANGE_HASH_VALUE
         return value
 

@@ -545,6 +545,57 @@ def annotate_variants_list_to_dataframe(
         raise ValueError("The output of annotate function is not a pandas DataFrame.")
 
 
+def lift_over_variants_df(
+    df: pd.DataFrame,
+    from_genome: str = "hg19",
+    dest_genome: str = "hg38",
+    username: str = None,
+    api_key: str = None,
+    use_netrc: bool = True,
+    progress: bool = True,
+    endpoint_url: str = "https://api.genebe.net/cloud/api-public/v1/liftover",
+) -> pd.DataFrame:
+    """
+    Lift over variants in a pandas DataFrame between human genome versions.
+
+    Parameters:
+        df (pd.DataFrame): DataFrame with columns 'chr', 'pos', 'ref', and 'alt'.
+        from_genome (str): Source genome version. Default is 'hg19'.
+        dest_genome (str): Destination genome version. Default is 'hg38'.
+        username (str): Optional API username.
+        api_key (str): Optional API key.
+        use_netrc (bool): Use .netrc for authentication. Default is True.
+        progress (bool): Show progress bar. Default is True.
+        endpoint_url (str): API endpoint URL.
+
+    Returns:
+        pd.DataFrame: DataFrame with additional columns 'chr_lifted', 'pos_lifted', 'ref_lifted', 'alt_lifted'.
+    """
+    # Concatenate columns 'chr', 'pos', 'ref', and 'alt' into the variant format "chr-pos-ref-alt"
+    variants = df.apply(
+        lambda row: f"{row['chr']}-{row['pos']}-{row['ref']}-{row['alt']}", axis=1
+    ).tolist()
+
+    # Call the lift_over_variants function
+    lifted_variants = lift_over_variants(
+        variants,
+        from_genome=from_genome,
+        dest_genome=dest_genome,
+        username=username,
+        api_key=api_key,
+        use_netrc=use_netrc,
+        progress=progress,
+        endpoint_url=endpoint_url,
+    )
+
+    # Split the lifted variants and add new columns to the original DataFrame
+    df[["chr_lifted", "pos_lifted", "ref_lifted", "alt_lifted"]] = pd.DataFrame(
+        [v.split("-") for v in lifted_variants], index=df.index
+    )
+
+    return df
+
+
 def lift_over_variants(
     variants: List[str],
     from_genome: str = "hg19",
