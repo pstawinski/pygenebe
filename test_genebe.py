@@ -1,7 +1,9 @@
+from typing import List
 from genebe import (
     annotate,
     parse_variants,
     lift_over_variants,
+    lift_over_variants_df,
     annotate_dataframe_variants,
     encode_vcf_variant_gbid,
 )
@@ -139,6 +141,36 @@ def test_parse_variants():
         assert isinstance(annotation, str)  # Ensure each annotation is a string
 
 
+def test_parse_variants_multiple():
+    # Test parse_spdi with a list of SPDI variants
+    variants = [
+        "rs10",
+        "rs11",
+        "DHFR:p.N51I",
+    ]
+    annotations = parse_variants(
+        variants,
+        genome="hg38",
+        batch_size=500,
+        username=None,
+        api_key=None,
+        multiple=True,
+        use_netrc=True,
+        endpoint_url="http://localhost:7180/cloud/api-public/v1/convert",
+        ignore_errors=True,
+    )
+    print("Variants:")
+    print(annotations)
+    assert isinstance(annotations, list)
+    assert len(annotations) == len(
+        variants
+    )  # Ensure number of annotations matches number of variants
+    for annotation in annotations:
+        assert isinstance(
+            annotation, list
+        )  # Ensure each annotation is a list of strings
+
+
 def test_annotate_variants_list_hg19():
     # Test case
     variants = ["1-12979845-T-C"]
@@ -183,6 +215,48 @@ def test_annotate_variants_list_hg19_impossible_liftover():
     print(annotations)
 
 
+def test_annotate_variants_list_liftover_empty_ref():
+    variants = ["chrM-1660--C"]
+
+    vars = lift_over_variants(
+        variants,
+        "hg19",
+        "hg38",
+        endpoint_url="http://localhost:7180/cloud/api-public/v1/liftover",
+    )
+
+    print("Lifted over variants:")
+    print(vars)
+    print(len(vars))
+    print(len(variants))
+    assert len(vars) == len(variants)
+
+
+def test_lift_over_df_empty_ref():
+    variants = ["MT-311--C"]
+
+    data = [line.split("-") for line in variants]
+    df = pd.DataFrame(data, columns=["chr", "pos", "ref", "alt"])
+
+    # Optionally, convert `pos` to integer
+    df["pos"] = df["pos"].astype(int)
+
+    # print head of df
+
+    vars = lift_over_variants_df(
+        df,
+        "hg19",
+        "hg38",
+        endpoint_url="http://localhost:7180/cloud/api-public/v1/liftover",
+    )
+
+    print("Lifted over variants:")
+    print(vars)
+    print(len(vars))
+    print(len(variants))
+    assert len(vars) == len(variants)
+
+
 def test_annotate_variants_list_hg19_impossible_liftover_old_inteface():
     # Test case
     variants = ["1-12979845-T-C", "1-13036247-T-A"]
@@ -208,12 +282,57 @@ def test_annotate_variants_list_hg19_impossible_liftover_old_inteface():
     print(annotations)
 
 
+def test_lift_over_massive():
+    # variants = ["chr6-160585140-T-G", "chrX-200-C-G", "invalid_input_missing_dash"]
+
+    # read variants from file massliftover.txt
+    with open(
+        "/ssd2/pio/safessd/workspace/workspace.python/genebe/genebe-client/massliftover.txt"
+    ) as f:
+        variants = f.read().splitlines()
+
+    variants = variants[:2000]  # Limit to first 1000 variants for testing
+
+    print("Number of variants to lift over:", len(variants))
+    print("First 10 variants:", variants[:10])
+
+    data = [line.split("-") for line in variants]
+    df = pd.DataFrame(data, columns=["chr", "pos", "ref", "alt"])
+
+    # Optionally, convert `pos` to integer
+    df["pos"] = df["pos"].astype(int)
+
+    # print head of df
+    print("First 10 rows of the DataFrame:")
+    print(df.head(10))
+
+    vars = lift_over_variants_df(
+        df,
+        "hg19",
+        "hg38",
+        endpoint_url="http://localhost:7180/cloud/api-public/v1/liftover",
+    )
+
+    # print head of vars after liftover
+    print("First 10 rows of the lifted over variants:")
+    print(vars.head(10))
+
+    print("Lifted over variants:")
+    print(len(vars))
+    print(len(variants))
+    assert len(vars) == len(variants)
+
+
 if __name__ == "__main__":
+    test_lift_over_df_empty_ref()
+    test_annotate_variants_list_liftover_empty_ref()
     test_gbid_generation()
     test_annotate_with_list()
     test_annotate_with_list_custom_annotations()
     test_annotate_with_dataframe()
     test_parse_variants()
     test_lift_over()
+    test_lift_over_massive()
     test_annotate_variants_list_hg19_impossible_liftover()
+    test_parse_variants_multiple()
     print("All tests passed!")

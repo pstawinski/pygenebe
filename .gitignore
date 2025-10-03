@@ -1,6 +1,8 @@
 build
 dist
 genebe.egg-info
-tests
+tests/__pycache__
 simple_runner.py
 publish.sh
+*.pyc
+.vscode

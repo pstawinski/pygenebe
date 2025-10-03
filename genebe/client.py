@@ -10,6 +10,9 @@ from urllib.parse import urlparse
 from .version import __version__
 from pathlib import Path
 
+
+logger = logging.getLogger(__name__)
+
 try:
     from tqdm import tqdm
 except ImportError:
@@ -266,19 +269,19 @@ def annotate(
     if api_key is None:
         if not apikey_username_showed:
             # Show it only once
-            logging.warning(
+            logger.warning(
                 "You are not logged in to GeneBe. We recommend using username and api_key arguments. Find out more on https://genebe.net/api ."
             )
             apikey_username_showed = True
     else:
         if not apikey_username_showed:
-            logging.info(f"I will try to log in as {username}")
+            logger.info(f"I will try to log in as {username}")
             apikey_username_showed = True
 
     # input data validation
     # Convert the list of strings to list of dictionaries
     dict_list = [_parse_variant_string(s) for s in variants]
-    logging.debug("I will query for " + json.dumps(dict_list))
+    logger.debug("I will query for " + json.dumps(dict_list))
 
     annotated_data = []
 
@@ -289,7 +292,7 @@ def annotate(
         # Prepare data for API request
         api_data = dict_list[i : i + batch_size]
 
-        logging.debug("Querying for " + json.dumps(api_data))
+        logger.debug("Querying for " + json.dumps(api_data))
 
         params = {"genome": genome}
         if use_refseq == False:
@@ -329,14 +332,14 @@ def annotate(
             api_results_raw = response.json()
             api_results = [element for element in api_results_raw["variants"]]
 
-            logging.debug("Backend result is " + json.dumps(api_results))
+            logger.debug("Backend result is " + json.dumps(api_results))
 
             # Append API results to annotated_data
             annotated_data.extend(api_results)
         elif response.status_code == 429:
             _handle_too_many_requests()
         else:
-            logging.error(
+            logger.error(
                 f"Got response with code {response.status_code} with body "
                 + response.text
             )
@@ -588,9 +591,23 @@ def lift_over_variants_df(
         endpoint_url=endpoint_url,
     )
 
+    # 👇 Bonus: Log malformed variants
+    for i, v in enumerate(lifted_variants):
+        if len(v.split("-")) != 4:
+            print(f"[WARN] Malformed lifted variant at index {i}: {v}")
+
     # Split the lifted variants and add new columns to the original DataFrame
+    split_variants = []
+    for v in lifted_variants:
+        parts = v.split("-")
+        if len(parts) == 4:
+            split_variants.append(parts)
+        else:
+            # fill with NaNs or fallback values if split is malformed
+            split_variants.append([None, None, None, None])
+
     df[["chr_lifted", "pos_lifted", "ref_lifted", "alt_lifted"]] = pd.DataFrame(
-        [v.split("-") for v in lifted_variants], index=df.index
+        split_variants, index=df.index
     )
 
     return df
@@ -692,6 +709,68 @@ def lift_over_variants(
     return result
 
 
+def parse_variants_df(
+    df: pd.DataFrame,
+    batch_size: int = 500,
+    username: str = None,
+    api_key: str = None,
+    use_netrc: bool = True,
+    progress: bool = True,
+    genome: str = "hg38",
+    endpoint_url: str = "https://api.genebe.net/cloud/api-public/v1/convert",
+    multiple: bool = False,
+    ignore_errors: bool = False,
+) -> pd.DataFrame:
+    """
+    Parses variants from a DataFrame and returns a new DataFrame with parsed components.
+
+    If multiple=True, adds a 'parsed_variants' column containing a list of results.
+    If multiple=False, splits the first result into 'chr', 'pos', 'ref', 'alt' columns.
+    """
+    if "variant" not in df.columns:
+        logger.warning("The DataFrame does not contain a 'variant' column.")
+        return df.copy()
+
+    if any(col in df.columns for col in ["chr", "pos", "ref", "alt"]):
+        logger.warning(
+            "The DataFrame contains 'chr', 'pos', 'ref', or 'alt' columns. They will be overwritten."
+        )
+
+    ids = df["variant"].tolist()
+
+    results = parse_variants(
+        ids=ids,
+        batch_size=batch_size,
+        username=username,
+        api_key=api_key,
+        use_netrc=use_netrc,
+        progress=progress,
+        genome=genome,
+        endpoint_url=endpoint_url,
+        multiple=multiple,
+        ignore_errors=ignore_errors,
+    )
+
+    df_out = df.reset_index(drop=True).copy()
+
+    if multiple:
+        # Add full list of parsed variants per row
+        df_out["parsed_variants"] = results
+    else:
+        # Handle empty strings and split into separate columns
+        results = [x if x else None for x in results]
+        parsed_df = pd.DataFrame(
+            [x.split("-") if x else [None, None, None, None] for x in results],
+            columns=["chr", "pos", "ref", "alt"],
+        )
+        parsed_df["pos"] = pd.to_numeric(parsed_df["pos"], errors="coerce").astype(
+            pd.Int32Dtype()
+        )
+        df_out = pd.concat([df_out, parsed_df], axis=1)
+
+    return df_out
+
+
 def parse_variants(
     ids: List[str],
     batch_size: int = 500,
@@ -701,7 +780,9 @@ def parse_variants(
     progress: bool = True,
     genome: str = "hg38",
     endpoint_url: str = "https://api.genebe.net/cloud/api-public/v1/convert",
-) -> List[str]:
+    multiple: bool = False,
+    ignore_errors: bool = False,
+) -> Union[List[str], List[List[str]]]:
     """
     Parses a list of genetic variants encoded in HGVS, SPDI, rs* or other format.
 
@@ -719,6 +800,11 @@ def parse_variants(
         progress (bool, optional): Show progress bar. Defaults to True.
         endpoint_url (str, optional): The API endpoint for parsing hgvs.
             Defaults to 'https://api.genebe.net/cloud/api-public/v1/convert'.
+        multiple (bool, optional): If True, return all parsed variants versions, if
+            false: single return for single variant.
+            Defaults to False.
+        ignore_errors (bool, optional): If True, ignore errors and return empty strings
+            for failed conversions. Defaults to False.
 
     Returns:
         List[str]: A list of dictionaries containing annotation information
@@ -729,22 +815,35 @@ def parse_variants(
         >>> input_variants = ["'NM_000277.2:c.1A>G", "22 28695868 AG A", "rs1228544607", "AGT Met259Thr"]
         >>> variants = parse_variants(input_variants)
         >>> print(variants)
-        ['12-102917129-AT-AC', '12-102852850-GA-G', ']
+        ['12-102917129-AT-AC', '12-102852850-GA-G']
 
     Note:
         - The number of the elements in returned list is always equal to the number of queries.
         If some position cannot be parsed, an empty string is returned.
     """
 
-    # logging in
-    auth = None
+    if (username is not None) and (api_key is not None):
+        auth = (username, api_key)
+        if use_netrc:
+            _save_credentials_to_netrc(endpoint_url, username, api_key)
+    elif use_netrc:
+        username, _, api_key = _read_netrc_credentials(endpoint_url)
+        if (username is not None) and (api_key is not None):
+            auth = (username, api_key)
+        else:
+            auth = None
+    else:
+        auth = None
+
     result = []
 
-    for i in tqdm(range(0, len(ids), batch_size)):
+    ranges = range(0, len(ids), batch_size)
+    iterator = tqdm(ranges) if progress else ranges
+    for i in iterator:
         # Prepare data for API request
         chunk = ids[i : i + batch_size]
 
-        logging.debug("Querying for " + json.dumps(chunk))
+        logger.debug("Querying for " + json.dumps(chunk))
         # Make API request
         response = requests.post(
             endpoint_url,
@@ -754,35 +853,40 @@ def parse_variants(
                 "Content-Type": "application/json",
                 "User-Agent": user_agent,
             },
-            params={genome: genome},
+            params={"genome": genome, "ignoreErrors": ignore_errors},
             auth=auth,
         )
 
         # Check if request was successful
         if response.status_code == 200:
             api_results_raw = response.json()
-            logging.debug("Api reqult raw" + json.dumps(api_results_raw))
+            logger.debug("Api reqult raw" + json.dumps(api_results_raw))
             api_results = []
 
             for variants_dict in api_results_raw:
-                if "variants" in variants_dict and variants_dict["variants"]:
-                    variants = variants_dict["variants"]
-                    variant = variants[0]
-                    formatted_variant = f"{variant.get('chr', '')}-{variant.get('pos', '')}-{variant.get('ref', '')}-{variant.get('alt', '')}"
-                    api_results.append(formatted_variant)
+                variants = variants_dict.get("variants", [])
+                if variants:
+                    all_variants = [
+                        f"{v.get('chr', '')}-{v.get('pos', '')}-{v.get('ref', '')}-{v.get('alt', '')}"
+                        for v in variants
+                    ]
+                    if multiple:
+                        api_results.append(all_variants)
+                    else:
+                        api_results.append(all_variants[0])  # take only the first one
                 else:
                     error_message = variants_dict.get(
                         "error", "No error message provided"
                     )
-                    logging.warning(f"Warning: {error_message}")
-                    api_results.append("")
+                    logger.warning(f"Warning: {error_message}")
+                    api_results.append([] if multiple else "")
 
             # Append API results to annotated_data
             result.extend(api_results)
         elif response.status_code == 429:
             _handle_too_many_requests()
         else:
-            logging.error(
+            logger.error(
                 f"Got response with code {response.status_code} with body "
                 + response.text
             )
@@ -886,5 +990,5 @@ def whoami(
         data = response.json()
         return data
     else:
-        logging.warning("Error:", response.status_code, response.text)
+        logger.warning("Error:", response.status_code, response.text)
         return {}

@@ -1,4 +1,5 @@
 import logging
+import warnings
 from itertools import islice
 from .client import annotate
 from typing import Optional
@@ -39,6 +40,10 @@ def annotate_vcf(
     """
     Annotates a VCF file using the annotate_variants_list function.
 
+    .. deprecated::
+        The annotate_vcf function is deprecated and will be removed in a future version.
+        Please use the Java CLI client instead: https://github.com/pstawinski/genebe-cli
+
     Args:
         input_vcf_path (str): Path to the input VCF file.
         output_vcf_path (str): Path to the output annotated VCF file.
@@ -68,6 +73,14 @@ def annotate_vcf(
         omit_normalization (bool, optional): Don't normalize variants. Use only if you are sure they are normalized already. Defaults to False.
         progress (bool, optional): Show progress bar
     """
+
+    # Issue deprecation warning
+    warnings.warn(
+        "The annotate_vcf function is deprecated and may be removed in a future version. "
+        "Please use the Java CLI client instead: https://github.com/pstawinski/genebe-cli",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     logging.info(
         f"Welcome. Annotating VCF file for genome {genome}. Ensure that VCF file has biallelic form."

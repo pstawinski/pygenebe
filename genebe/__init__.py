@@ -5,10 +5,16 @@ from .gbid import (
     encode_vcf_variant_gbid,
 )
 
+from .transcriptid import (
+    encode_transcript_id,
+    decode_transcript_id,
+)
+
 from .client import (
     annotate_variants_list,
     annotate_variants_list_to_dataframe,
     parse_variants,
+    parse_variants_df,
     annotate,
     annotate_dataframe_variants,
     whoami,

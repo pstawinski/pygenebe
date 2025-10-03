@@ -8,6 +8,7 @@ setup(
     install_requires=["pymmh3", "tinynetrc", "pandas", "requests", "tqdm", "jsonlines"],
     extras_require={
         "cpp": ["mmh3", "cyvcf2"],
+        "test": ["pytest>=6.0", "pytest-cov", "pytest-mock", "coverage"],
     },
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
