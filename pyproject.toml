@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "genebe"
+version = "0.2.2"  # replace with version.__version__ if you want
+description = "GeneBe Client: A user-friendly system for annotating genetic variants"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{name="Piotr Stawinski"}]
+license = {text="MIT"}  # optional
+dependencies = [
+    "pymmh3",
+    "tinynetrc",
+    "pandas",
+    "requests",
+    "tqdm",
+    "jsonlines",
+    "numpy<2",
+]
+
+[project.optional-dependencies]
+cpp = ["mmh3"]
+test = ["pytest>=6.0", "pytest-cov", "pytest-mock", "coverage"]
+
+[project.scripts]
+genebe = "genebe.entrypoint:main"

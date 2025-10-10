@@ -353,12 +353,7 @@ def annotate(
             consequences_fields = None
             transcript = item.get("transcript")
             if transcript:  # check the ACMG chosen transcript
-                if transcript.startswith("E"):
-                    consequences_fields = "consequences_ensembl"
-                else:
-                    consequences_fields = "consequences_refseq"
-
-                consequences_refseq = item[consequences_fields]
+                consequences_refseq = item["consequences"]
                 if consequences_refseq:  # Check if the list is not empty
                     first_consequence = consequences_refseq[0]
                     for key in ["gene_symbol", "gene_hgnc_id", "transcript", "hgvs_c"]:
@@ -372,9 +367,6 @@ def annotate(
                         if effects_list is not None
                         else ""
                     )
-            # Remove the 'consequences_*' fields, if exists
-            item.pop("consequences_ensembl", None)
-            item.pop("consequences_refseq", None)
 
     if join_with_oryginal_df:
         annotation_df = pd.DataFrame(annotated_data)

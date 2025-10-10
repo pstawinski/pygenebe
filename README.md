@@ -23,27 +23,8 @@ genebe annotate --help
 
 
 ##### Annotating VCF using `annotate` command
-GeneBe client allows you to annotate your VCF file with ease. Use the following command:
 
-```
-genebe annotate --input input.vcf.gz --output output.vcf.gz
-```
-
-Remember that your VCF file must be in a single allelic format! Utilize bcftools (https://samtools.github.io/bcftools/) to split the file. The output VCF will contain additional fields.
-
-To use VCF annoation you have to have `cyvcf2` package installed. Take a look at the Installation section below.
-
-If your VCF file is large (over 10.000 variants), you may encounter request limits. To avoid this, create a GeneBe account with an API Key and provide your login/key using the --username and --api-key arguments. You can always check your limits with the account command. Update your annotation command as follows:
-
-```
-genebe annotate --input input.vcf.gz --output output.vcf.gz --username your_username --api-key your_api_key
-```
-
-For more information call
-
-```
-genebe annotate --help
-```
+Please use [GeneBe java client](https://github.com/pstawinski/genebe-cli) for VCF annotation. VCF support in Python was not reliable.
 
 ##### Using `account` command
 
@@ -151,7 +132,6 @@ pip install genebe[cpp]
 or install modules
 
 ```
-pip install cyvcf2
 pip install mmh3
 ```
 
@@ -188,6 +168,8 @@ Your feedback is crucial for improving GeneBe client. Thank you for contributing
 ### Other
 
 For more information about GeneBe, visit GeneBe website, https://genebe.net .
+
+
 
 
 

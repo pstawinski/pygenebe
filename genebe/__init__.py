@@ -21,6 +21,4 @@ from .client import (
     lift_over_variants,
     lift_over_variants_df,
 )
-from .vcf_simple_annotator import annotate_vcf
-from .json_simple_annotator import annotate_json
 from .version import __version__

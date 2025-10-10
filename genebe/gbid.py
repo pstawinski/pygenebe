@@ -1,11 +1,3 @@
-try:
-    # try with a fast c-implementation ...
-    import mmh3 as mmh3
-except ImportError:
-    # ... otherwise fallback to this code!
-    import pymmh3 as mmh3
-
-
 class InvalidPositionException(Exception):
     def __init__(self, message):
         super().__init__(message)
@@ -128,6 +120,12 @@ class VariantIdEncoder:
     positionEncoder = PositionEncoder()
 
     def hash_function(self, input_string: str, seed: int = 104729) -> int:
+        try:
+            # try with a fast c-implementation ...
+            import mmh3 as mmh3
+        except ImportError:
+            # ... otherwise fallback to this code!
+            import pymmh3 as mmh3
         # Compute the 128-bit hash from the input string using MurmurHash3 (hash128 returns a single 128-bit integer)
         hash_value = mmh3.hash128(input_string, seed)
         # Extract the high 64 bits and low 64 bits from the 128-bit hash

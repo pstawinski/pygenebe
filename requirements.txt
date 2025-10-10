@@ -1,0 +1,10 @@
+pymmh3
+mmh3 # optional
+tinynetrc
+pandas
+requests
+wheel
+pytest
+tqdm
+cyvcf2 # optional
+jsonlines

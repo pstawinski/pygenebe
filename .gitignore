@@ -4,5 +4,7 @@ genebe.egg-info
 tests/__pycache__
 simple_runner.py
 publish.sh
-*.pyc
+.venv
 .vscode
+__pycache__
+.pytest_cache
