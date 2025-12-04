@@ -4,6 +4,8 @@ class InvalidPositionException(Exception):
 
 
 class PositionEncoder:
+    __slots__ = ("chromosomes", "chromosome_sizes", "sizes", "offsets")
+
     CHR_NOT_SUPPORTED = -1
     ERROR_WRONG_CHR_POSITION = -2
 
@@ -69,7 +71,7 @@ class PositionEncoder:
         self.offsets = [sum(self.sizes[:i]) for i in range(len(self.chromosomes))]
 
     def encode(self, chromosome: str, position: int):
-        return self.encode_1_based_without_throw(self, chromosome, position)
+        return self.encode_1_based_without_throw(chromosome, position)
 
     def encode_1_based_without_throw(self, chromosome, position):
         chr_name = self._chr(chromosome)
@@ -101,6 +103,8 @@ def encode_vcf_position_gbid(chromosome, position):
 
 
 class VariantIdEncoder:
+    __slots__ = ("positionEncoder",)
+
     RADIX = 36
     MAX_DEL_LENGTH = (2**7) - 1
     MAX_INS_LENGTH = 9
@@ -115,9 +119,19 @@ class VariantIdEncoder:
     MASK_CHANGE_HASH_VALUE = (
         0b0000000000000000000000000000000000011111111111111111111111111111
     )
-    BASES = ["A", "C", "G", "T"]
 
-    positionEncoder = PositionEncoder()
+    # Pre-computed values for optimization
+    BASE_ENCODING = {"A": 0, "C": 1, "G": 2, "T": 3}
+    VALID_BASES = frozenset("ACGNT")
+
+    # Pre-computed shift amounts
+    SHIFT_POS = 30
+    SHIFT_INS_LEN = 25
+    SHIFT_DEL = 18
+    SHIFT_C_HASH = 29
+
+    def __init__(self):
+        self.positionEncoder = PositionEncoder()
 
     def hash_function(self, input_string: str, seed: int = 104729) -> int:
         try:
@@ -126,10 +140,10 @@ class VariantIdEncoder:
         except ImportError:
             # ... otherwise fallback to this code!
             import pymmh3 as mmh3
-        # Compute the 128-bit hash from the input string using MurmurHash3 (hash128 returns a single 128-bit integer)
+        # Compute the 128-bit hash from the input string using MurmurHash3
         hash_value = mmh3.hash128(input_string, seed)
-        # Extract the high 64 bits and low 64 bits from the 128-bit hash
-        low_part = hash_value & 0xFFFFFFFFFFFFFFFF  # Mask to get the lower 64 bits
+        # Extract the low 64 bits
+        low_part = hash_value & 0xFFFFFFFFFFFFFFFF
         return low_part
 
     def set_value(self, input, mask, value):
@@ -137,29 +151,17 @@ class VariantIdEncoder:
         new_value = (input & ~mask) | ((value << shift_count) & mask)
         return new_value
 
-    def encode_bases(self, alt):
-        bit_offset = 0
+    def encode_bases_fast(self, alt):
+        """Optimized base encoding using dict lookup and direct bit operations"""
         encoded = 0
-        for c in alt:
-            value = 0
-            if c == "A":
-                value = 0
-            elif c == "C":
-                value = 1
-            elif c == "G":
-                value = 2
-            elif c == "T":
-                value = 3
-            else:
+        for i, c in enumerate(alt):
+            value = self.BASE_ENCODING.get(c)
+            if value is None:
                 raise InvalidPositionException(
                     "Cannot encode alt as it contains strange letters: " + alt
                 )
-
-            encoded = self.set_value(encoded, 0b11 << bit_offset, value)
-
-            bit_offset += 2
-
-        return int(encoded)
+            encoded |= value << (i * 2)
+        return encoded
 
     def hash(self, chromosome, position, del_length, alt):
         change = f"{chromosome}:{position}:{del_length}:{alt}"
@@ -173,25 +175,22 @@ class VariantIdEncoder:
         value = hash_value & self.MASK_CHANGE_HASH_VALUE
         return value
 
-    def encode1based(self, chromosome, position, ref, alt):
-        # make 0 based
-        position = position - 1
+    def encodeSpdi(self, chromosome: str, position: int, del_length: int, ins: str):
+        """
+        Encode variant using SPDI format (0-based position, deletion length, insertion string)
 
-        altNorm = alt.upper()
+        Args:
+            chromosome: Chromosome name
+            position: 0-based position
+            del_length: Length of deletion (refLength)
+            ins: Insertion string (normalized alt)
+        """
+        # Optimized chromosome normalization
+        if chromosome.startswith(("chr", "CHR", "Chr")):
+            chromosomeNormalized = chromosome[3:].upper()
+        else:
+            chromosomeNormalized = chromosome.upper()
 
-        while len(ref) > 0 and len(altNorm) > 0 and ref[0] == altNorm[0]:
-            # strip leading common character, may happen in deletions / insertions
-            position += 1
-            ref = ref[1:]
-            altNorm = altNorm[1:]
-
-        # if ref is string than replace with length
-        if isinstance(ref, str):
-            ref = len(ref)
-
-        refLength = ref
-
-        chromosomeNormalized = chromosome.lstrip("chr").upper()
         positionId = self.positionEncoder.encode_1_based_without_throw(
             chromosomeNormalized, position
         )
@@ -201,66 +200,75 @@ class VariantIdEncoder:
                 "Wrong position: {}:{}.".format(chromosome, position)
             )
 
-        if not set(altNorm).issubset("ACGNT"):
+        # Fast validation using frozenset
+        if not self.VALID_BASES.issuperset(ins):
             raise InvalidPositionException(
                 "Alt should contain only ACGNT, position: {}, altNorm: {}.".format(
-                    position, altNorm
+                    position, ins
                 )
             )
 
-        useChangeHash = False
+        # Check conditions once
+        ins_len = len(ins)
+        useChangeHash = (
+            ins_len > self.MAX_INS_LENGTH or del_length > self.MAX_DEL_LENGTH
+        )
+        hasN = "N" in ins
 
-        if len(altNorm) > self.MAX_INS_LENGTH or refLength > self.MAX_DEL_LENGTH:
-            useChangeHash = True
-
-        encodedAlt = 0
-
-        if "N" in alt:
-            useChangeHash = True
+        if useChangeHash or hasN:
+            # Change hash path
+            encoded = 0
+            encoded = self.set_value(encoded, self.MASK_C_HASH, 1)
+            encoded = self.set_value(encoded, self.MASK_POS, positionId)
+            changeHash = self.change_hash(del_length, ins)
+            encoded = self.set_value(encoded, self.MASK_CHANGE_HASH_VALUE, changeHash)
+            return encoded
         else:
-            encodedAlt = self.encode_bases(altNorm)
+            # Direct encoding path - optimized with direct bit operations
+            encodedAlt = self.encode_bases_fast(ins)
 
-        if positionId == -1:
-            return hash(chromosomeNormalized, position, refLength, altNorm)
-        else:
-            if useChangeHash:
-                encoded = 0
-                encoded = self.set_value(encoded, self.MASK_HASH, 0)
-                encoded = self.set_value(encoded, self.MASK_C_HASH, 1)
-                encoded = self.set_value(encoded, self.MASK_POS, positionId)
+            # Combine all values in one operation
+            encoded = (
+                (positionId << self.SHIFT_POS)
+                | (ins_len << self.SHIFT_INS_LEN)
+                | (del_length << self.SHIFT_DEL)
+                | encodedAlt
+            )
+            return encoded
 
-                changeHash = self.change_hash(refLength, altNorm)
-                encoded = self.set_value(
-                    encoded, self.MASK_CHANGE_HASH_VALUE, changeHash
-                )
+    def encode1based(self, chromosome, position, ref, alt):
+        # make 0 based
+        position = position - 1
 
-                return encoded
+        altNorm = alt.upper()
 
-            else:
-                encoded = 0
-                # print('1'+bin(encoded))
-                encoded = self.set_value(encoded, self.MASK_HASH, 0)
-                # print('2'+bin(encoded))
-                encoded = self.set_value(encoded, self.MASK_C_HASH, 0)
-                # print('3'+bin(encoded))
-                encoded = self.set_value(encoded, self.MASK_POS, positionId)
-                # print('4'+bin(encoded))
-                encoded = self.set_value(encoded, self.MASK_INS_LEN, len(altNorm))
-                # print('5'+bin(encoded))
-                encoded = self.set_value(encoded, self.MASK_DEL, refLength)
-                # print('6'+bin(encoded))
-                encoded = self.set_value(encoded, self.MASK_INS, encodedAlt)
-                # print('7'+bin(encoded))
-                return encoded
+        # Strip leading common characters
+        while ref and altNorm and ref[0] == altNorm[0]:
+            position += 1
+            ref = ref[1:]
+            altNorm = altNorm[1:]
+
+        # if ref is string than replace with length
+        refLength = len(ref) if isinstance(ref, str) else ref
+
+        # Now call encodeSpdi with the SPDI format parameters
+        return self.encodeSpdi(chromosome, position, refLength, altNorm)
 
 
-# Singleton instance of PositionEncoder
+# Singleton instance of VariantIdEncoder
 _variant_encoder_instance = VariantIdEncoder()
 
 
 def encode_vcf_variant_gbid(chromosome, position, ref, alt):
+    """Optimized function to encode VCF variant"""
     return _variant_encoder_instance.encode1based(chromosome, position, ref, alt)
 
 
+def encode_spdi_variant_gbid(chromosome, position0, del_length, ins):
+    """Optimized function to encode SPDI variant"""
+    return _variant_encoder_instance.encodeSpdi(chromosome, position0, del_length, ins)
+
+
+# Example usage:
 # v = VariantIdEncoder()
 # print(v.encode1based("1", 12, "A", "C"))

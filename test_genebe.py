@@ -6,18 +6,40 @@ from genebe import (
     lift_over_variants_df,
     annotate_dataframe_variants,
     encode_vcf_variant_gbid,
+    encode_vcf_position_gbid,
 )
 
 import pandas as pd
 
 
+def test_position_id_generation():
+    # Test with CSV data
+    df = pd.read_csv("tests/position-ids-hg38.csv")
+
+    for _, row in df.iterrows():
+        chr = str(row["chr"])
+        pos = int(row["pos1based"])
+        expected_id = int(row["id"])
+        encoded = encode_vcf_position_gbid(chr, pos)
+        assert (
+            encoded == expected_id
+        ), f"For chr={chr}, pos={pos}: expected {expected_id}, got {encoded}"
+
+
 def test_gbid_generation():
-    chr = "1"
-    pos = 16044378
-    ref = "C"
-    alt = "CACACACACAT"
-    encoded = encode_vcf_variant_gbid(chr, pos, ref, alt)
-    assert encoded == 17227519582999023
+    # Test with CSV data
+    df = pd.read_csv("tests/variant-ids-hg38.csv")
+
+    for _, row in df.iterrows():
+        chr = str(row["chr"])
+        pos = int(row["pos1based"])
+        ref = str(row["ref"]) if pd.notna(row["ref"]) and row["ref"] != "" else ""
+        alt = str(row["alt"]) if pd.notna(row["alt"]) and row["alt"] != "" else ""
+        expected_id = int(row["id"])
+        encoded = encode_vcf_variant_gbid(chr, pos, ref, alt)
+        assert (
+            encoded == expected_id
+        ), f"For chr={chr}, pos={pos}, ref={ref}, alt={alt}: expected {expected_id}, got {encoded}"
 
 
 def test_annotate_with_list():

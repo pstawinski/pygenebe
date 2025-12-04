@@ -140,6 +140,7 @@ def annotate(
     annotator: str = "snpeff",
     output_format: str = "list",
     custom_annotations: List[str] = None,
+    all_genes: bool = False,
 ) -> Union[List[Dict[str, object]], pd.DataFrame]:
     """
     Annotates genetic variants.
@@ -173,6 +174,7 @@ def annotate(
         output_format (str): The desired format of the output, either 'list' for a list of
             dictionaries or 'dataframe' for a pandas DataFrame. Defaults to 'list'.
             If input is a dataframe, then ignored and returns a dataframe.
+        all_genes (bool): If True, compute ACMG for all genes regarding this variant.
 
     Returns:
         Union[List[Dict[str, object]], pd.DataFrame]: If output_format is 'list', returns a list of
@@ -194,7 +196,8 @@ def annotate(
         ...     api_key="apikey456",
         ...     use_netrc=False,
         ...     endpoint_url='https://api.genebe.net/cloud/api-public/v1/variants',
-        ...     output_format="list"
+        ...     output_format="list",
+        ...     all_genes=True,
         ... )
         >>> print(annotations)
         [{'chr': '7', 'pos': 69599651, 'ref': 'A', 'alt': 'G', 'annotation': '...'}, ...]
@@ -313,6 +316,8 @@ def annotate(
             params["annotator"] = annotator
         if custom_annotations:
             params["customAnnotations"] = ",".join(custom_annotations)
+        if all_genes:
+            params["allGenes"] = all_genes
 
         # Make API request
         response = requests.post(

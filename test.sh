@@ -4,9 +4,11 @@
 pip install pytest pytest-cov
 
 # Run all tests with pytest
-pytest tests/ -v
+python -m pytest tests/ -v
+
+python -m pytest test_genebe.py -v
 
 # Run with coverage if desired
 echo ""
 echo "Running tests with coverage:"
-pytest tests/ --cov=genebe --cov-report=term-missing
+python -m pytest tests/ --cov=genebe --cov-report=term-missing

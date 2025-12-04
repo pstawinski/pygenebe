@@ -3,6 +3,7 @@
 from .gbid import (
     encode_vcf_position_gbid,
     encode_vcf_variant_gbid,
+    encode_spdi_variant_gbid,
 )
 
 from .transcriptid import (

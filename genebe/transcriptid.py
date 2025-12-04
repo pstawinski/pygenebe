@@ -40,7 +40,7 @@ class GbIdentifierType(Enum):
     XP = ("XP_", 9, True, True)
     YP = ("YP_", 9, True, True)
     XR = ("XR_", 9, True, True)
-    unassigned_transcript = (("unassigned_transcript_", 0, False, True),)
+    unassigned_transcript = ("unassigned_transcript_", 0, False, True)
     ENSR = ("ENSR", 11, False, False)
 
     def __init__(self, prefix, padding_size, computed, refseq):

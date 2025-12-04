@@ -4,12 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "genebe"
-version = "0.2.2"  # replace with version.__version__ if you want
+version = "0.2.7"
 description = "GeneBe Client: A user-friendly system for annotating genetic variants"
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [{name="Piotr Stawinski"}]
-license = {text="MIT"}  # optional
 dependencies = [
     "pymmh3",
     "tinynetrc",
